@@ -2,6 +2,7 @@ const baseConfig = require('./webpack.base.config')
 const merge = require('webpack-merge')
 const webpack = require('webpack')
 const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 /**
  * 开发环境下，webpack的相关配置。
  * 1. proxy
@@ -18,6 +19,7 @@ const devConfig = merge(baseConfig, {
     port: 8028,
     hot: true,
     compress: true,
+    quiet: true,
     filename: '[name].[hash].js',
     headers: {
       'x-Custom-check': 'localhost'
@@ -41,3 +43,5 @@ const devConfig = merge(baseConfig, {
     })
   ]
 })
+
+module.exports = devConfig

@@ -2,16 +2,18 @@ const path = require('path')
 const friendlyFormatter = require('eslint-friendly-formatter')
 const miniCss = require('mini-css-extract-plugin')
 const vueConfig = require('./vue.config')
+const { VueLoaderPlugin } = require('vue-loader')
 
 /**
  * 公用webpack打包配置
  */
 module.exports = {
+  context: path.resolve(__dirname, '../'),
   entry: {
-    common: path.resolve(__dirname, '../src/index.js')
+    app: path.resolve(__dirname, '../src/index.js')
   },
   output: {
-    filename: '[name].[hash].js',
+    filename: '[name].js',
     path: path.resolve(__dirname, '../dist'),
     // publicPath: '',
     library: 'drender'
@@ -27,8 +29,8 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        loader: ['eslint-loader'],
+        test: /\.(js|vue)$/,
+        loader: 'eslint-loader',
         enforce: 'pre',
         options: {
           formatter: friendlyFormatter,
@@ -43,7 +45,7 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: [/node_modules/],
-        loader: ['babel-loader'],
+        loader: 'babel-loader',
         options: {
           presets: ['es2015']
         }
@@ -84,10 +86,11 @@ module.exports = {
       }
     ]
   },
-  plugin: [
+  plugins: [
     new miniCss({
       filename: '[name].[hash].css',
       publicPath: '/css/'
-    })
+    }),
+    new VueLoaderPlugin()
   ]
 }
