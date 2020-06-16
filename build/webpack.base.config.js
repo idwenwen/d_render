@@ -10,7 +10,7 @@ const { VueLoaderPlugin } = require('vue-loader')
 module.exports = {
   context: path.resolve(__dirname, '../'),
   entry: {
-    app: path.resolve(__dirname, '../src/index.js')
+    app: './src/index.js'
   },
   output: {
     filename: '[name].js',
@@ -47,7 +47,7 @@ module.exports = {
         exclude: [/node_modules/],
         loader: 'babel-loader',
         options: {
-          presets: ['es2015']
+          presets: ['@babel/preset-env']
         }
       },
 

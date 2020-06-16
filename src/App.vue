@@ -1,7 +1,8 @@
 <template>
-  <div id="app">
+  <div>
     this is app
     <span>version: {{ version }}</span>
+    <span>time: {{ date }}</span>
   </div>
 </template>
 
@@ -10,7 +11,8 @@ export default {
   name: 'App',
   data() { 
     return {
-      version: '1.0.0'
+      version: '1.0.0',
+      date: new Date().toString()
     }
   }
  }

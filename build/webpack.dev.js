@@ -20,7 +20,6 @@ const devConfig = merge(baseConfig, {
     hot: true,
     compress: true,
     quiet: true,
-    filename: '[name].[hash].js',
     headers: {
       'x-Custom-check': 'localhost'
     },
