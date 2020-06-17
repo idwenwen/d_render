@@ -92,23 +92,36 @@ export default {
           }
         },
         'headerCellClassNmae': 'table-content__header-cell-default'
+      },
+      defaultSelectCol: {
+        type: 'select'
+      },
+      defaultIndexCol: {
+        type: 'index',
+        minWidth: 50,
+        index: typeof this.index === 'number'
+          ? (start) => { return start + this.index - 1 }
+          : this.index
       }
     }
   },
   methods: {
-    getLink(h, text, link) {
+    // 预设链接形式数据
+    getLink(h, props, link) {
       return h(
         'span',
         {
           'class': { 'table-content__link': true },
           on: {
-            click: link
+            click: () => { link(props) }
           }
         },
-        text
+        props.row[props.colum.property]
       )
     },
-    getOpera(h, operation) {
+
+    // 预设操作列
+    operationCol(h, operation) {
       const operas = []
       for (const key in operation) {
         operas.push(this.getLink(h, key, operation[key]))
@@ -123,14 +136,16 @@ export default {
         )
         : false
     },
-    getCols(h, attrs){
+
+    // 用户自定义列内容设置。
+    eachColumn(h, attrs){
       const variable = {
         props: Object.assign(this.defaultHeaderSet, attrs),
       }
       if (attrs.link) {
         variable.scopedSlots = {
-          default: ({column}) => {
-            return this.getLink(h, column.data, attrs.link)
+          default: (props) => {
+            return this.getLink(h, props, attrs.link)
           }
         }
       }
@@ -139,64 +154,34 @@ export default {
         variable
       )
     },
-    getIndex(h) {
-      if (this.index) {
-        return h(
-          'el-table-column',
-          {
-            props: {
-              type: 100,
-              minWidth: 50,
-              index: typeof this.index === 'number'
-                ? (start) => { return start + this.index - 1 }
-                : this.index
-            }
-          }
-        )
-      } else {
-        return false
-      }
-    },
-    getSelect(h) {
-      if (this.select) {
-        return h(
-          'el-table-column',
-          {
-            props: {
-              type: 'selection',
-            }
-          }
-        )
-      } else {
-        return false
-      }
-    },
-    getHeader(h) {
+
+    // 汇总数据列内容。
+    columns(h) {
       const cols = []
-      const select = this.getSelect(h)
-      if (select) cols.push(select)
-      const index = this.getIndex(h)
-      if (index) cols.push(index)
-      this.header.forEach(item => {
-        cols.push(this.getCols(h, item))
+      let colAttrs = this.header
+      if(this.index) colAttrs = [this.defaultIndexCol].concat(colAttrs)
+      if(this.select) colAttrs = [this.defaultSelectCol].concat(colAttrs)
+      colAttrs.forEach(item => {
+        cols.push(this.eachColumn(h, item))
       })
-      const operation = this.getOpera(h, this.operation)
-      if (operation) cols.push(operation)
+      if(this.operation) cols.push(this.operationCol(h))
       return cols
     },
-    getTableContent(h) {
+
+    // 表格内容绘制
+    table(h) {
       return h(
         'el-table',
         {
           props: Object.assign(this.defaultTableSet, this.attrs),
           ref: 'tableContent'
         },
-        this.getHeader(h)
+        this.columns(h)
       )
     }
   },
   render(h) {
-    return this.getTableContent(h)
+    return this.table(h)
   },
 }
 </script>
