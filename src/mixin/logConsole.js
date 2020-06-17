@@ -22,6 +22,20 @@ const log = {
 
     consoleError(type) {
       Logger.console(type)
+    },
+
+    necessaryParam(...args) {
+      args.forEach(item => {
+        if (!item) {
+          const errObj = new Error('Missing necessary parameter')
+          this.throwError({
+            type: 'Error',
+            err: 'MissVariableError',
+            text: 'Missing necessary parameter - necessaryParam'
+          }, errObj)
+          throw errObj
+        }
+      })
     }
   }
 }

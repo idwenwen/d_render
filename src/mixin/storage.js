@@ -5,23 +5,25 @@
 const storageMixin = {
   methods: {
     setCache(key, val) {
-      try {
-        sessionStorage.setItem(key, JSON.stringify(val))
-      } catch(e) {
-        
-      }
+      this.necessaryParam(key, val)
+      sessionStorage.setItem(key, JSON.stringify(val))
     },
 
-    getCache() {
-      return sessionStorage.getItem(key)
+    getCache(key) {
+      this.necessaryParam(key)
+      return JSON.parse(sessionStorage.getItem(key))
     },
 
-    setLongCache() {
-
+    setLongCache(key, val) {
+      this.necessaryParam(key, val)
+      localStorage.setItem(key, JSON.stringify(val))
     },
 
-    getLongCache() {
-
+    getLongCache(key) {
+      this.necessaryParam(key)
+      return JSON.parse(localStorage.getItem(key))
     }
   }
 }
+
+export default storageMixin

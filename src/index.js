@@ -6,6 +6,7 @@ window.Vue = Vue
 
 import store from './store'
 import router from './router'
+import './mixin'
 
 import ElementUI from 'element-ui'
 import location from 'element-ui/lib/locale/lang/zh-CN'
