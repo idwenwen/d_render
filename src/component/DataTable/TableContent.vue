@@ -29,7 +29,8 @@ export default {
      *   filter-multiple,
      *   filter-method,
      *
-     *   link: Function
+     *   link: Function,
+     *   children: []
      * }]
      */
     header: {
@@ -38,13 +39,13 @@ export default {
     },
     attrs: {
       type: Object,
-      default: () => []
+      default: () => {}
     },
 
     index: {
       // eslint-disable-next-line vue/require-prop-type-constructor
       type: Boolean | Number | Function,
-      default: true
+      default: 1
     },
 
     select: {
@@ -61,6 +62,14 @@ export default {
     operation: {
       type: Object,
       default: () => {}
+    },
+
+    /**
+     * combine likely data
+     */
+    combine: {
+      type: Boolean,
+      default: false
     }
   },
   data() { 
@@ -72,42 +81,167 @@ export default {
         'resizable': true,
         'sortable': false,
         'sortMethod': () => 0,
-        'align': 'left',
-        'headerAlign': 'left',
-        'filters': [],
-        'filterMultiple': true,
-        'filterMethod': () => true,
-        'className': 'table-content__cell-default'
+        'align': 'center',
+        'headerAlign': 'center',
+        // 'className': 'table-content__cell-default'
       },
       defaultTableSet: {
         'maxHeight': 300,
         'size': 'mini',
         'fit': true,
         'highlightCurrentRow': true,
-        'cellClassName': ({row, column}) => {
-          if (column.label !== 'index') {
-            if (row[column.property + '_disable']) {
-              return 'table-content__cell-disable'
-            }
-          }
-        },
-        'headerCellClassNmae': 'table-content__header-cell-default'
+        'border': true,
+        // 'cellClassName': ({row, column}) => {
+        //   if (column.label !== 'index') {
+        //     if (row[column.property + '_disable']) {
+        //       return 'table-content__cell-disable'
+        //     }
+        //   }
+        // },
+        // 'headerCellClassNmae': 'table-content__header-cell-default',
+        'emptyText': 'No Data'
       },
       defaultSelectCol: {
-        type: 'select'
+        type: 'selection',
+        width: 70
       },
       defaultIndexCol: {
         type: 'index',
-        minWidth: 50,
+        label: 'index',
+        width: 70,
         index: typeof this.index === 'number'
           ? (start) => { return start + this.index - 1 }
-          : this.index
-      }
+          : this.index,
+        className: 'table-content__cell-index'
+      },
+      currentTableData: this.data,
+      currentSortColumn: null,
+      currentOrder: null
+    }
+  },
+  watch: {
+    data: {
+      handler() {
+        this.sortChange({
+          column: this.currentSortColumn,
+          order: this.currentOrder
+        })
+      },
+      deep: true
     }
   },
   methods: {
+    sortChange({column, order}) {
+      this.currentSortColumn = column
+      this.currentOrder = order
+      let currentTableData = this.data
+      const compareVal = (val1, val2, order) => {
+        if (val1 !== '-' && val2 !== '-') {
+          return order === 'ascending'
+            ? (val1 > val2
+              ? 1 : -1)
+            : (val1 > val2
+              ? -1 : 1)
+        } else if (val1 !== '-' && val2 === '-') {
+          return -1
+        } else {
+          return 1
+        }
+      }
+      if (order !== null) {
+        currentTableData.sort((a, b) => {
+          const aVal = a[column.property]
+          const aDis = a[column.property + '_disable']
+          const bVal = b[column.property]
+          const bDis = b[column.property + '_disable']
+          if (aDis && !bDis) {
+            return 1
+          } else if (!aDis && !bDis) {
+            return -1
+          } else if (aDis && bDis) {
+            return 0
+          } else {
+            compareVal(aVal, bVal, order)
+          }
+        })
+      }
+      this.currentTableData = currentTableData
+    },
+
+    spanMethod({column, rowIndex}) {
+      // combine different cell
+      debugger
+      const needCompare = []
+      const compareRow = (row1, row2, compareCol) => {
+        for (const val of compareCol) {
+          if (row1[val] !== row2[val]) {
+            return false
+          }
+        }
+        return true
+      }
+      const getHeaders = () => {
+        const headers = []
+        for(const val of this.header) {
+          if (val.children) {
+            for (const item of val.children) {
+              
+            }
+          }
+        }
+      }
+        let findInTable = false
+        for (const val of this.header) {
+          needCompare.unshift(val.prop)
+          if (val.prop === column.property) {
+            findInTable = true
+            break
+          }
+        }
+        if(findInTable) {
+          if (this.data[rowIndex - 1] && compareRow(this.data[rowIndex], this.data[rowIndex - 1], needCompare)) {
+            return {
+              rowspan: 0,
+              colspan: 0
+            }
+          } else {
+            let row = 1
+            while(this.data[rowIndex + row] && compareRow(this.data[rowIndex], this.data[rowIndex + row], needCompare)) {
+              row += 1
+            }
+            return {
+              rowspan: row,
+              colspan: 1
+            }
+          }
+        }
+        return {
+          rowspan: 1,
+          colspan: 1
+        }
+    },
+
+    addEvents() {
+      const res = {}
+      const defaultEvents = ['sortChange', 'filterChange', 'currentChange']
+      for (const val of defaultEvents) {
+        res[val] = (...args) => {
+          if (this.$listeners[val]) {
+            this.$emit(val, ...args)
+          } else {
+            if (this[val]) this[val](...args)
+          }
+        }
+      }
+      return res
+    },
+
+    setCurrentRow(row) {
+      this.$refs['tableContent'][0].setCurrentRow(row)
+    },
+
     // 预设链接形式数据
-    getLink(h, props, link) {
+    getLink(h, props, link, alias) {
       return h(
         'span',
         {
@@ -116,31 +250,38 @@ export default {
             click: () => { link(props) }
           }
         },
-        props.row[props.colum.property]
+        (alias || props.row[props.colum.property])
       )
     },
 
     // 预设操作列
     operationCol(h, operation) {
-      const operas = []
-      for (const key in operation) {
-        operas.push(this.getLink(h, key, operation[key]))
-      }
-      return operas.length > 0
-        ? h(
-          'div',
-          {
-            'class': { 'table-content__operations': true },
-          },
-          operas
-        )
-        : false
+      return h(
+        'el-table-column',
+        {
+          'class': { 'table-content__operations': true },
+          scopedSlots: {
+            default: (props) => {
+              const operas = []
+              for (const key in operation) {
+                operas.push(this.getLink(h, props, operation[key], key))
+              }
+              return h(
+                'div',
+                {
+                  'class': { 'inline': true, 'hor-center': true }
+                },
+                operas)
+            }
+          }
+        }
+      )
     },
 
     // 用户自定义列内容设置。
     eachColumn(h, attrs){
       const variable = {
-        props: Object.assign(this.defaultHeaderSet, attrs),
+        props: Object.assign({}, this.defaultHeaderSet, attrs),
       }
       if (attrs.link) {
         variable.scopedSlots = {
@@ -149,33 +290,55 @@ export default {
           }
         }
       }
+      const childHeader = []
+      if (attrs.children) {
+        for (const val of attrs.children) {
+          childHeader.push(this.eachColumn(h, val))
+        }
+      }
       return h(
         'el-table-column',
-        variable
+        variable,
+        childHeader
       )
     },
 
     // 汇总数据列内容。
     columns(h) {
       const cols = []
-      let colAttrs = this.header
-      if(this.index) colAttrs = [this.defaultIndexCol].concat(colAttrs)
-      if(this.select) colAttrs = [this.defaultSelectCol].concat(colAttrs)
+      let colAttrs = [...this.header]
+      if(this.index) colAttrs.unshift(this.defaultIndexCol)
+      if(this.select) colAttrs.unshift(this.defaultSelectCol)
       colAttrs.forEach(item => {
         cols.push(this.eachColumn(h, item))
       })
-      if(this.operation) cols.push(this.operationCol(h))
+      if(this.operation && Object.key(this.operation).length > 0)
+        cols.push(this.operationCol(h, this.operation))
       return cols
     },
 
     // 表格内容绘制
     table(h) {
+      const variable = {
+        props: Object.assign({}, this.defaultTableSet, this.attrs),
+        ref: 'tableContent',
+        on: this.addEvents()
+      }
+      variable.props.data = this.currentTableData
+      if (this.combine) {
+        variable.props.spanMethod = this.spanMethod
+      }
+      if (this.select) { // Adding event-listener for selection
+        const eves = ['select', 'selectAll', 'selectionChange']
+        for (const val of eves) {
+          variable.on[val] = (select, row) => {
+            this.$emit(val, select, row)
+          }
+        }
+      }
       return h(
         'el-table',
-        {
-          props: Object.assign(this.defaultTableSet, this.attrs),
-          ref: 'tableContent'
-        },
+        variable,
         this.columns(h)
       )
     }

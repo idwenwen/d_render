@@ -6,9 +6,10 @@ window.Vue = Vue
 
 import store from './store'
 import router from './router'
-import './mixin'
+import './mixin/defaultMixin'
 
 import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
 import location from 'element-ui/lib/locale/lang/zh-CN'
 
 import App from './App.vue'
