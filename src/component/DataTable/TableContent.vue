@@ -180,21 +180,23 @@ export default {
         }
         return true
       }
-      const getHeaders = () => {
+      const getHeaders = (list) => {
         const headers = []
-        for(const val of this.header) {
+        for(const val of list) {
           if (val.children) {
-            for (const item of val.children) {
-              
-            }
+            headers.push(...getHeaders(val.children))
+          } else {
+            headers.push(val)
           }
         }
+        return headers
       }
-        let findInTable = false
-        for (const val of this.header) {
-          needCompare.unshift(val.prop)
-          if (val.prop === column.property) {
-            findInTable = true
+      let findInTable = false
+      const headers = getHeaders(this.header)
+      for (const val of headers) {
+        needCompare.unshift(val.prop)
+        if (val.prop === column.property) {
+          findInTable = true
             break
           }
         }
