@@ -1,6 +1,11 @@
 <script>
+import DataInput from '../DataInput'
+import util from '@/util/polyfill'
 export default {
   name: 'TableContent',
+  components: {
+    'data-input': DataInput
+  },
   props: {
     data: {
       type: Array,
@@ -70,6 +75,11 @@ export default {
     combine: {
       type: Boolean,
       default: false
+    },
+
+    titleChange: {
+      type: Boolean,
+      default: false
     }
   },
   data() { 
@@ -114,7 +124,8 @@ export default {
           : this.index,
         className: 'table-content__cell-index'
       },
-      currentTableData: this.data,
+      currentTableData: [...this.data],
+      currentTableHeader: [...this.header],
       currentSortColumn: null,
       currentOrder: null
     }
@@ -134,14 +145,11 @@ export default {
     sortChange({column, order}) {
       this.currentSortColumn = column
       this.currentOrder = order
-      let currentTableData = this.data
-      const compareVal = (val1, val2, order) => {
+      let currentTableData = [...this.data]
+      const compareVal = (val1, val2) => {
         if (val1 !== '-' && val2 !== '-') {
-          return order === 'ascending'
-            ? (val1 > val2
-              ? 1 : -1)
-            : (val1 > val2
-              ? -1 : 1)
+          return val1 > val2
+              ? 1 : -1
         } else if (val1 !== '-' && val2 === '-') {
           return -1
         } else {
@@ -151,17 +159,13 @@ export default {
       if (order !== null) {
         currentTableData.sort((a, b) => {
           const aVal = a[column.property]
-          const aDis = a[column.property + '_disable']
           const bVal = b[column.property]
-          const bDis = b[column.property + '_disable']
-          if (aDis && !bDis) {
-            return 1
-          } else if (!aDis && !bDis) {
+          if (bVal === '-') {
             return -1
-          } else if (aDis && bDis) {
-            return 0
+          } else if (aVal === '-') {
+            return 1
           } else {
-            compareVal(aVal, bVal, order)
+            return compareVal(aVal, bVal)
           }
         })
       }
@@ -170,7 +174,6 @@ export default {
 
     spanMethod({column, rowIndex}) {
       // combine different cell
-      debugger
       const needCompare = []
       const compareRow = (row1, row2, compareCol) => {
         for (const val of compareCol) {
@@ -225,13 +228,16 @@ export default {
 
     addEvents() {
       const res = {}
-      const defaultEvents = ['sortChange', 'filterChange', 'currentChange']
+      const defaultEvents = ['sort-change', 'filter-change', 'current-change']
       for (const val of defaultEvents) {
         res[val] = (...args) => {
           if (this.$listeners[val]) {
             this.$emit(val, ...args)
           } else {
-            if (this[val]) this[val](...args)
+            const name = util.replaceOrigin(val, /-[a-z]/, (str) => {
+              return str.replace('-', '').toUpperCase()
+            })
+            if (this[name]) this[name](...args)
           }
         }
       }
@@ -253,6 +259,59 @@ export default {
           }
         },
         (alias || props.row[props.colum.property])
+      )
+    },
+
+    getChangeSet(h, props) {
+      const child = []
+      let setHeader = false
+      child.push(h(
+        'data-input',
+        {
+          props: { 'initData': props.column.label },
+          directives: [{
+            name: 'show',
+            value: setHeader
+          }],
+          on: {
+            'updated': (newLabel) => {
+              for (const val of this.currentTableHeader) {
+                if (val.prop === props.column.property) {
+                  val.label === newLabel
+                  break
+                }
+              }
+            },
+            'cancel': () => {
+
+            }
+          },
+          ref: props.column.label + '_dataInput'
+        }
+      ))
+      child.push(h(
+        'span',
+        {
+          'class': 'data-table__header-span',
+          directives: [
+            {
+              name: 'show',
+              value: !setHeader,
+            }
+          ]
+        },
+        props.column.label
+      ))
+      return h(
+        'div',
+        {
+          'class': 'table-content__header-set',
+          on: {
+            click: (ev) => {
+              if (ev.)
+            }
+          }
+        }
       )
     },
 
@@ -290,6 +349,12 @@ export default {
           default: (props) => {
             return this.getLink(h, props, attrs.link)
           }
+        }
+      }
+      if (this.titleChange) {
+        variable.scopedSlots = variable.scopedSlots || {}
+        variable.scopedSlots.header = (props) => {
+          return this.getChangeSet(props)
         }
       }
       const childHeader = []

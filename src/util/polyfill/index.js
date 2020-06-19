@@ -20,8 +20,19 @@ function concat(...args) {
  * @param {Array} l1 
  * @param {Array} l2 
  */
-function combine(l1, l2, limit) {
-  const list = l1.concat(l2)
+// function combine(l1, l2, limit) {
+//   const list = l1.concat(l2)
   
 
+// }
+
+function replaceOrigin(origin, str, operation) {
+  const matched = origin.match(str)
+  if (matched) {
+    const getReplace = operation(matched[0])
+    return origin.replace(matched[0], getReplace)
+  }
+  return origin
 }
+
+export default {replaceOrigin, concat}
