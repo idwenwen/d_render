@@ -14,7 +14,7 @@
       class="el-icon-success data-input__success_icon"
     />
     <i
-      v-if="fail"
+      v-if="cancel"
       class="el-icon-error data-input__success_icon"
     />
   </div>
@@ -56,6 +56,9 @@ export default {
     },
     visiable(showing) {
       this.showing = !!showing
+    },
+    clearContent() {
+      this.currentContent = ''
     }
   }
  }

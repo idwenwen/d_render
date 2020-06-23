@@ -9,6 +9,7 @@
       :index="1"
       :select="true"
       :combine="true"
+      :title-change="true"
     />
   </div>
 </template>

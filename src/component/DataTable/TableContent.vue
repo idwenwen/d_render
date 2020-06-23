@@ -268,11 +268,10 @@ export default {
       child.push(h(
         'data-input',
         {
+          'style': {
+            'display': setHeader ? 'none': ''
+          },
           props: { 'initData': props.column.label },
-          directives: [{
-            name: 'show',
-            value: setHeader
-          }],
           on: {
             'updated': (newLabel) => {
               for (const val of this.currentTableHeader) {
@@ -283,7 +282,8 @@ export default {
               }
             },
             'cancel': () => {
-
+              this.$refs[props.column.label + '_dataInput'][0].clearContent()
+              setHeader = false
             }
           },
           ref: props.column.label + '_dataInput'
@@ -293,12 +293,9 @@ export default {
         'span',
         {
           'class': 'data-table__header-span',
-          directives: [
-            {
-              name: 'show',
-              value: !setHeader,
-            }
-          ]
+          'style': {
+            'display': !setHeader ? 'none': ''
+          }
         },
         props.column.label
       ))
@@ -307,11 +304,12 @@ export default {
         {
           'class': 'table-content__header-set',
           on: {
-            click: (ev) => {
-              if (ev.)
+            click: () => {
+              setHeader = !setHeader
             }
           }
-        }
+        },
+        child
       )
     },
 
@@ -354,7 +352,7 @@ export default {
       if (this.titleChange) {
         variable.scopedSlots = variable.scopedSlots || {}
         variable.scopedSlots.header = (props) => {
-          return this.getChangeSet(props)
+          return this.getChangeSet(h, props)
         }
       }
       const childHeader = []

@@ -1,68 +1,104 @@
-const LogType = ['info', 'debug', 'warning', 'Error']
+/**
+ * 确定基础日志类行，通过传递类行可以添加其他类行内容。
+ */
+const BasicType = ['debug', 'info', 'warning', 'error']
 
-function Log() {
-  this.logType = new Set(['error'].concat(LogType))
-  this.logType.forEach(item => {
-    item = item.toLocaleLowerCase()
-    this[item] = []
-    addProto(Log, item + 'Catch', (text, error) => {
-      let param = text
-      if (!(typeof text === 'object')) {
-        param = {
-          text: text.toString(),
-          type: item
+class Logger {
+  /**
+   * create Logger instance
+   * @param {Array} types Type of Object
+   */
+  constructor(types) {
+    this.DEFTYPE = 'info'
+    this.logType = BasicType.concat(types)
+    this.logType.forEach(item => {
+      this[item] = []
+    })
+  }
+
+  report(err) {
+    this[err.type || this.DEFTYPE].push(new CustomerError(err))
+  }
+
+  console(type) {
+    this[type || this.DEFTYPE].forEach(item => {
+      item.console()
+    })
+  }
+
+  clear(type) {
+    this[type || this.DEFTYPE] = []
+  }
+
+  send(type) {
+    const reportArticle = []
+    this[type || this.DEFTYPE].forEach(item => {
+      reportArticle.push(item.toString())
+    })
+    return reportArticle
+  }
+
+  [Symbol.iterator]() {
+    const self = this
+    let index = 0
+    return {
+      next() {
+        if (this.logType[index + 1]) {
+          index += 1
+          return {
+            value: {
+              type: self.logType[index],
+              log: self[self.logType[index]]
+            },
+            done: false
+          }
+        } else {
+          return {
+            value: null,
+            done: true
+          }
         }
       }
-      this.catchError(param, error)
-    })
-  })
-}
-
-function addProto(constructorOperation, name, operation) {
-  if (typeof constructorOperation != 'function') {
-      logger.errorCatch({
-        err: 'BuildError',
-        text: 'There is no Log component, can work for current app - Log.addProto'
-      })
-  } else {
-    constructorOperation.prototype[name] = operation
+    }
   }
 }
 
-Log.prototype.catchError = function catchError(
-  {err, type, text} =
-  {err: 'UnCatchError', type: 'error', text: 'Do not get error-information'},
-  obj) {
-    type = type.toLocaleLowerCase()
-    this[type + 'Catch'].push({text: this.combine(err, type, text), obj})
-}
+const DEF_ERROR_TYPE = 'CError'
+const DEF_ERROR_TEXT = 'Error happend'
 
-Log.prototype.combine = function combine(err = 'Error', type = 'error', text = '') {
-  type = type.toLocaleLowerCase()
-  return `${err} : [${type}], ${text}`
-}
+class CustomerError {
+  constructor({type, text, errObj, operation, lineNum}) {
+    this.type = type || DEF_ERROR_TYPE
+    this.text = text || DEF_ERROR_TEXT
+    this.operation = operation
+    this.lineNum = lineNum
+    this.errObj = errObj
+  }
 
-Log.prototype.console = function consoleLog(type) {
-  if (!type) {
-    this.consoleAll()
-  } else {
-    this[type].forEach(item => {
-      console.log('-------------------------------------------------')
-      console.error(item.text, item.obj)
-    })
+  console() {
+    const tip = (this.operation || this.lineNum)
+      ? ('-' + this.operation 
+        ? (this.operation + ':') : '' +
+      this.lineNum
+        ? this.lineNum : '') : ''
+    console.error(`${this.type}: ${this.text} ${tip}`, this.errObj)
+  }
+
+  toString() {
+    const tip = (this.operation || this.lineNum)
+      ? ('-' + this.operation 
+        ? (this.operation + ':') : '' +
+      this.lineNum
+        ? this.lineNum : '') : ''
+    const str = 
+    `
+      ${this.type}: ${this.text} ${tip},
+      ${this.errObj ? this.errObj.message : ''}
+    `
+    return str
   }
 }
 
-Log.prototype.consoleAll = function consoleLog() {
-  this.logType.forEach(item => {
-    this.console(item)
-  })
-}
+const logContainer = new Logger()
 
-Log.prototype.gzip = function gzip() {
-  //gzip current log for get mo info
-}
-
-const logger = new Log()
-
-export default logger
+export default logContainer
