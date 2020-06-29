@@ -6,6 +6,6 @@ import Logger from '../FrontEndLogger'
 
 class WorkerChecker {
   constructor(path) {
-    new Worker(path)
+    this.worker = new Worker(path)
   }
 }
