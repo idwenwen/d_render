@@ -5,16 +5,9 @@ export default {
     'fit': true,
     'highlightCurrentRow': true,
     'border': true,
-    // 'cellClassName': ({row, column}) => {
-    //   if (column.label !== 'index') {
-    //     if (row[column.property + '_disable']) {
-    //       return 'table-content__cell-disable'
-    //     }
-    //   }
-    // },
-    // 'headerCellClassNmae': 'table-content__header-cell-default',
     'emptyText': 'No Data'
   },
+
   DEF_COLUMN_ATTR: {
     'minWidth': 120,
     'showOverflowTooltip': true,
@@ -23,13 +16,19 @@ export default {
     'sortable': false,
     'sortMethod': () => 0,
     'align': 'center',
-    'headerAlign': 'center',
-    // 'className': 'table-content__cell-default'
+    'headerAlign': 'center'
   },
+
   DEF_INDEX_ATTR: {
     type: 'index',
     label: 'index',
     width: 70,
     className: 'table-content__cell-index'
   },
+  DEF_INDEX_BEGIN: 1,
+
+  DEF_SELECT_ATTR: {
+    type: 'selection',
+    width: 70
+  }
 }

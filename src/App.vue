@@ -9,13 +9,23 @@
       :index="1"
       :select="true"
       :combine="true"
-      :title-change="true"
-    />
+    >
+      <template
+        v-slot:customCol="props"
+      >
+        <el-link
+          type="warning"
+          @click.stop="linkClick(props)"
+        >
+          {{ linkContent(props) }}
+        </el-link>
+      </template>
+    </table-content>
   </div>
 </template>
 
 <script>
-import TableContent from './component/DataTable/TableContent'
+import TableContent from './component/DataTable/cTable'
 export default {
   name: 'App',
   components: {
@@ -32,6 +42,10 @@ export default {
             label: 'nickname',
             prop: 'nickname',
             sortable: true,
+            type: 'link',
+            linkMethod: (props) => {
+              console.log(props)
+            }
           },
           {
             label: 'familyname',
@@ -42,6 +56,22 @@ export default {
       }, {
         label: 'name',
         prop: 'name'
+      }, {
+        label: 'active',
+        type: 'operation',
+        operations: [
+          {
+            name: 'check',
+            text: 'check',
+            icon: 'el-icon-warning-outline',
+            method: (props) => {
+              console.log(props)
+            }
+          }
+        ]
+      }, {
+        label: 'custom',
+        type: 'custom'
       }],
       data: []
     }
@@ -59,6 +89,16 @@ export default {
         res.push({nickname: i, familyname: i + 1, name: i * 2 + 1})
       }
       this.data = res
+    },
+    linkClick(props) {
+      debugger
+      console.log(props)
+      console.log('log check')
+    },
+    linkContent() {
+      // props
+      console.log('linkContent')
+      return 'default'
     }
   }
  }
