@@ -9,6 +9,10 @@
       :index="1"
       :select="true"
       :combine="true"
+      :total="40"
+      :async="true"
+      @pageChange="pageChange"
+      @sortChange="sortChange"
     >
       <template
         v-slot:customCol="props"
@@ -25,7 +29,7 @@
 </template>
 
 <script>
-import TableContent from './component/DataTable/cTable'
+import TableContent from './component/DataTable'
 export default {
   name: 'App',
   components: {
@@ -80,9 +84,9 @@ export default {
     this.getTableData()
   },
   methods: {
-    getTableData() {
+    getTableData(start = 0) {
       const res = []
-      for (let i = 0 ; i < 5; i++) {
+      for (let i = start * 2 ; i < start * 2 + 2; i++) {
         res.push({nickname: i, familyname: i, name: i * 2})
         res.push({nickname: i, familyname: i + 1, name: i * 2})
         res.push({nickname: i, familyname: i, name: i * 2 + 1})
@@ -90,8 +94,13 @@ export default {
       }
       this.data = res
     },
+    pageChange(page) {
+      this.getTableData(page)
+    },
+    sortChange(obj) {
+      console.log(obj)
+    },
     linkClick(props) {
-      debugger
       console.log(props)
       console.log('log check')
     },

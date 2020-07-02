@@ -50,6 +50,21 @@ export default {
     }
   },
 
+  watch: {
+    data: {
+      handler() {
+        this.currentTableData = [...this.data]
+      },
+      deep: true
+    },
+    header: {
+      handler() {
+        this.currentTableHeader = [...this.header]
+      },
+      deep: true
+    }
+  },
+
   methods: {
 
     setCurrentRow(row) {
@@ -66,12 +81,12 @@ export default {
       const res = {}
       for (const val of events) {
         res[val] = (...args) => {
-          if (this.$listeners[val]) {
-            this.$emit(val, ...args)
+          const name = util.replaceOrigin(val, /-[a-z]/, (str) => {
+            return str.replace('-', '').toUpperCase()
+          })
+          if (this.$listeners[name]) {
+            this.$emit(name, ...args)
           } else {
-            const name = util.replaceOrigin(val, /-[a-z]/, (str) => {
-              return str.replace('-', '').toUpperCase()
-            })
             if (this[name]) this[name](...args)
           }
         }
