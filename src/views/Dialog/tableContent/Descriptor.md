@@ -14,17 +14,18 @@
       // 当前内容标识隔开符号， 默认是冒号
       $between: ':'
     }]
-  * select: [
+  * form: [
       {
+        type: 'input' | 'select' | 'radio' | 'checkbox'
         label: String // 非角色形式的选择，只能对照相关表。
-        ratio: String // checkbox选择label,
         
-        property: String // 标识当前展示的header，data等数据之中的property对应的数据。
+        value: String | Array // form表格内容。
+        children: Array // 相关子组件内容， 每一项类似当前的数据内容。
 
         // 当前ratio有相关下拉框选择
         select: [{
           label: String // 选择项展示内容,
-          property: String // 类似上面的property
+          value: String // value类似上面的property
         }]
       }
     ]

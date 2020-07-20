@@ -10,8 +10,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
  */
 const devConfig = merge(baseConfig, {
   mode: 'development',
-
-  devtool:'cheap-eval-source-map',
   
   devServer: {
     clientLogLevel: 'warning',
@@ -20,9 +18,6 @@ const devConfig = merge(baseConfig, {
     hot: true,
     compress: true,
     quiet: true,
-    headers: {
-      'x-Custom-check': 'localhost'
-    },
     historyApiFallback: true,
     open: true,
     overlay: true,

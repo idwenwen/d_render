@@ -17,9 +17,6 @@
         </div>
       </div>
     </div>
-    <keep-alive>
-      <component :is="componentId" />
-    </keep-alive>
   </el-dialog>
 </template>
 

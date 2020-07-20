@@ -20,6 +20,7 @@ export default {
   methods: {
     init() {
       const index = {}
+      // 确定组件之家的相关内容。connect
       for (const val of this.attrs) {
         index[val.id] = 0
         if (val.group) {

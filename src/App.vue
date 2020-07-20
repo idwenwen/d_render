@@ -1,113 +1,190 @@
 <template>
   <div>
-    this is app
-    <span>version: {{ version }}</span>
-    <span>time: {{ date }}</span>
-    <table-content
-      :header="header"
-      :data="data"
-      :index="1"
-      :select="true"
-      :combine="true"
-      :total="40"
-      :async="true"
-      @pageChange="pageChange"
-      @sortChange="sortChange"
-    >
-      <template
-        v-slot:customCol="props"
-      >
-        <el-link
-          type="warning"
-          @click.stop="linkClick(props)"
-        >
-          {{ linkContent(props) }}
-        </el-link>
-      </template>
-    </table-content>
+    <c-group 
+      :options="[dataes, table, charts]"
+    />
   </div>
 </template>
 
 <script>
-import TableContent from './component/DataTable'
 export default {
   name: 'App',
   components: {
-    'table-content': TableContent
+    // groups: () => import('./components/FormComponent/Group'),
+    // ctable: () => import('./components/TableComponent'),
+    cGroup: () => import('./components/ComponentGroup')
   },
   data() { 
     return {
-      version: '1.0.0',
-      date: new Date().toString(),
-      header: [{
-        label: 'id',
-        children: [
-          {
-            label: 'nickname',
-            prop: 'nickname',
-            sortable: true,
-            type: 'link',
-            linkMethod: (props) => {
-              console.log(props)
+      dataes: {
+        type: 'form',
+        props: {
+          form: [{
+            type: 'title',
+            props: {
+              title: 'Testing Form'
             }
+          },{
+            type: 'filterSelect',
+            name: 'tableSelection',
+            props: {
+              options: [{
+                label: 'guest',
+                value: 'guest'
+              }, {
+                label: 'host',
+                value: [{
+                  label: '1000',
+                  value: '1000'
+                }, {
+                  label: '999',
+                  value: '999'
+                }]
+              }]
+            }
+          }, {
+            type: 'text',
+            props: {
+              content: 'this is total for {t}',
+              data: {
+                '{t}': 'testing'
+              }
+            }
+          }, {
+            type: 'input',
+            name: 'textInput',
+            props: {}
+          }, {
+            type: 'search'
+          }],
+          toProperty: 'tableSelection'
+        }
+      },
+      table: {
+        type: 'table',
+        props: {
+          data: {
+            'guest': [
+              { woe: 1.5023, iv: 1.25234, variable: 'x0'},
+              { woe: 1.5023, iv: 1.25234, variable: 'x1'},
+              { woe: 1.5023, iv: 1.25234, variable: 'x2'},
+              { woe: 1.5023, iv: 1.25234, variable: 'x3'},
+              { woe: 1.5023, iv: 1.25234, variable: 'x4'},
+              { woe: 1.5023, iv: 1.25234, variable: 'x5'},
+              { woe: 1.5023, iv: 1.25234, variable: 'x6'},
+              { woe: 1.5023, iv: 1.25234, variable: 'x7'},
+              { woe: 1.5023, iv: 1.25234, variable: 'x9'},
+              { woe: 1.5023, iv: 1.25234, variable: 'x10'},
+              { woe: 1.5023, iv: 1.25234, variable: 'x11'},
+              { woe: 1.5023, iv: 1.25234, variable: 'x12'},
+              { woe: 1.5023, iv: 1.25234, variable: 'x13'},
+            ],
+            '1000': [
+              { woe: 2.012341234, iv: 0.512341, variable: 'host_1000_1'},
+              { woe: 2.012341234, iv: 0.512341, variable: 'host_1000_2'},
+              { woe: 2.012341234, iv: 0.512341, variable: 'host_1000_3'},
+              { woe: 2.012341234, iv: 0.512341, variable: 'host_1000_4'}
+            ],
+            '999': [
+              { woe: 2.012341234, iv: 0.512341, variable: 'host_999_1'},
+              { woe: 2.012341234, iv: 0.512341, variable: 'host_999_2'},
+              { woe: 2.012341234, iv: 0.512341, variable: 'host_999_3'}
+            ]
           },
-          {
-            label: 'familyname',
-            prop: 'familyname',
-            sortable: true,
-          }
-        ]
-      }, {
-        label: 'name',
-        prop: 'name'
-      }, {
-        label: 'active',
-        type: 'operation',
-        operations: [
-          {
-            name: 'check',
-            text: 'check',
-            icon: 'el-icon-warning-outline',
-            method: (props) => {
-              console.log(props)
+          header: [
+            {
+              type: 'index'
+            },
+            {
+              label: 'variable',
+              valur: 'variable'
+            },
+            {
+              label: 'woe',
+              valur: 'woe'
+            },
+            {
+              label: 'iv',
+              valur: 'iv'
             }
+          ]
+        }
+      },
+      charts: {
+        type: 'chart',
+        prop: {
+          options:  {
+            title: {
+              text: '折线图堆叠'
+            },
+            tooltip: {
+              trigger: 'axis'
+            },
+            legend: {
+              data: ['邮件营销', '联盟广告', '视频广告', '直接访问', '搜索引擎']
+            },
+            grid: {
+              left: '3%',
+              right: '4%',
+              bottom: '3%',
+              containLabel: true
+            },
+            toolbox: {
+              feature: {
+                saveAsImage: {}
+              }
+            },
+            xAxis: {
+              type: 'category',
+              boundaryGap: false,
+              data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+            },
+            yAxis: {
+              type: 'value'
+            },
+            series: [
+              {
+                name: '邮件营销',
+                type: 'line',
+                stack: '总量',
+                data: [120, 132, 101, 134, 90, 230, 210]
+              },
+              {
+                name: '联盟广告',
+                type: 'line',
+                stack: '总量',
+                data: [220, 182, 191, 234, 290, 330, 310]
+              },
+              {
+                name: '视频广告',
+                type: 'line',
+                stack: '总量',
+                data: [150, 232, 201, 154, 190, 330, 410]
+              },
+              {
+                name: '直接访问',
+                type: 'line',
+                stack: '总量',
+                data: [320, 332, 301, 334, 390, 330, 320]
+              },
+              {
+                name: '搜索引擎',
+                type: 'line',
+                stack: '总量',
+                data: [820, 932, 901, 934, 1290, 1330, 1320]
+              }
+            ]
           }
-        ]
-      }, {
-        label: 'custom',
-        type: 'custom'
-      }],
-      data: []
+        }
+      }
     }
   },
-  created() {
-    this.getTableData()
-  },
   methods: {
-    getTableData(start = 0) {
-      const res = []
-      for (let i = start * 2 ; i < start * 2 + 2; i++) {
-        res.push({nickname: i, familyname: i, name: i * 2})
-        res.push({nickname: i, familyname: i + 1, name: i * 2})
-        res.push({nickname: i, familyname: i, name: i * 2 + 1})
-        res.push({nickname: i, familyname: i + 1, name: i * 2 + 1})
-      }
-      this.data = res
+    change() {
+      this.checkboxGroupIt.push('guest')
     },
-    pageChange(page) {
-      this.getTableData(page)
-    },
-    sortChange(obj) {
-      console.log(obj)
-    },
-    linkClick(props) {
-      console.log(props)
-      console.log('log check')
-    },
-    linkContent() {
-      // props
-      console.log('linkContent')
-      return 'default'
+    consoles(value) {
+      console.log(JSON.stringify(value))
     }
   }
  }
