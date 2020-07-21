@@ -1,171 +1,168 @@
 <template>
-  <el-checkbox-group v-model="selected">
-    <div
-      v-for="(item, index) in options"
-      :key="index"
+  <section>
+    <el-checkbox-group
+      v-if="Array.isArray(options)"
+      v-model="selected"
     >
-      <el-checkbox
-        :label="item.value"
-        :disabled="disableSet[item.value]"
-      >
-        {{ item.label }}
-      </el-checkbox>
-      <div
-        v-if="item.children"
-      >
-        <groups
-          :ref="item.value + 'group'"
-          :form="item.children.form"
-          :name="item.value"
-          :class-name="item.children.className"
-          :def="def"
-          :to-array="true"
-          :disabled="groupDisable(item.value)"
-          @change="groupChange"
-        />
-      </div>
-    </div>
-  </el-checkbox-group>
+      <c-box
+        v-for="(item, index) in options"
+        :key="index"
+        :ref="item.value"
+        :label="item.label"
+        :value="item.value"
+        :group="item.group || {}"
+        @change="boxChange(item.value)"
+        @form="boxForm(item.value)"
+        @search="boxSearch"
+      />
+    </el-checkbox-group>
+    <c-box
+      v-else
+      :ref="options.value"
+      :label="options.label"
+      :value="options.value"
+      :group="options.group || {}"
+      @change="boxChange(options.value)"
+      @form="boxForm(options.value)"
+      @search="boxSearch"
+    />
+  </section>
 </template>
 
 <script>
+import basicOperation from '@/mixin/BasicOperation'
 export default {
-  name: 'Checkbox',
+  name: 'CusCheckbox',
   components: {
-    groups: () => import('../Group')
+    cBox: () => import('./CheckboxSingle')
   },
+  mixins: [
+    basicOperation
+  ],
   props: {
     options: {
-      type: Array,
+      // eslint-disable-next-line vue/require-prop-type-constructor
+      type: Array | Object,
       default: () => []
     },
     disabled: {
-      type: Boolean,
+      // eslint-disable-next-line vue/require-prop-type-constructor
+      type: Boolean | Array,
       default: false
-    },
-    name: {
-      type: String,
-      default: ''
-    },
-    def: {
-      type: Boolean,
-      default: true
-    },
-    value: {
-      type: String,
-      default: ''
     }
   },
   data() { 
     return {
+      propResult: {},
+      formResult: {},
       selected: [],
-      result: {},
-      disableSet: {},
       canSend: false
     }
   },
   watch: {
-    selected: {
+    propResult: {
       handler() {
-        this.disablePart()
         this.change()
       },
       deep: true
     },
-    disableSet: {
+    formResult: {
       handler() {
-        this.disablePart()
+        this.confirm()
       },
       deep: true
     }
   },
-  mounted() {
-    this.init()
-  },
   methods: {
-    init() {
-      for (const val of this.options) {
-        this.disableSet[val.value] = this.disabled
-      }
-      if (this.def) {
-        this.selected = []
-        this.selected.push(this.options[0].value)
+    boxChange(label) {
+      return (res) => {
+        debugger
+        this.$set(this.propResult, label, res)
       }
     },
-
-    groupChange(res, name) {
-      this.result[name] = res
-      this.change()
-    },
-
-    getProperty() {
-      const list = JSON.parse(JSON.stringify(this.selected))
-      for (let i = 0 ; i < list.length; i++) {
-        const val = this.result[list[i]]
-        if (val) {
-          list.splice(i, 1)
-          if (Array.isArray(val)) {
-            list.splice(i, 0, ...val)
-          } else {
-            list.splice(i, 0, val)
-          }
-        }
-      }
-      return list
-    },
-    
-    disablePart() {
-      for (const val of this.options) {
-        if (this.selected.indexOf(val.value) < 0 || this.disableSet[val.value]) {
-          if (this.$refs[val.value + 'group'] && this.$refs[val.value + 'group'][0].disable) {
-            this.$refs[val.value + 'group'][0].disable()
-          }
-        } else {
-          if (this.$refs[val.value + 'group'] && this.$refs[val.value + 'group'][0].able) {
-            this.$refs[val.value + 'group'][0].able()
-          }
-        }
+    boxForm(label) {
+      return (res) => {
+        this.$set(this.formResult, label, res)
       }
     },
-
-    groupDisable(val) {
-      return this.selected.indexOf(val) < 0
+    boxSearch(res) {
+      this.$emit('search', res)
     },
-
     change() {
       if (!this.canSend) {
         let canSend = true
-        for (const val of this.options) {
-          if (val.children && !this.result[val.value]) {
+        if (Array.isArray(this.options)) {
+          for (const val of this.options) {
+            if (!this.propResult[val.value]) {
+              canSend = false
+              break
+            }
+          }
+        } else {
+          if (!this.propResult[this.options.value]) {
             canSend = false
-            break
           }
         }
         this.canSend = canSend
       }
       if (this.canSend) {
-        const list = this.getProperty()
-        this.$emit('change', list, this.name)
+        const getProperty = () => {
+          const res = []
+          for(const key in this.filterBySelect(this.propResult)) {
+            const val = this.propResult[key]
+            if (Array.isArray(val)) {
+              res.push(...val)
+            } else {
+              res.push(val)
+            }
+          }
+          return res
+        }
+        this.$emit('change', getProperty())
       }
     },
     confirm() {
-      return this.getProperty()
+      this.$emit('form', {
+        select: this.selected,
+        value: this.filterBySelect(this.formResult)
+      })
     },
-    reset() {
-      this.selected = [this.options[0]]
+    filterBySelect(obj) {
+      const res = {}
+      for (const val of this.selected) {
+        res[val] = obj[val]
+      }
+      return res
     },
     disable() {
-      for (const val of this.options) {
-        this.disableSet[val.value] = true
+      const list = this.toArr(this.options)
+      for (const val of list) {
+        this.refOpera(val.value, 'disable')
       }
     },
     able() {
-      for (const val of this.options) {
-        this.disableSet[val.value] = false
+      const list = this.toArr(this.options)
+      for (const val of list) {
+        this.refOpera(val.value, 'able')
+      }
+    },
+    getParam() {
+      return this.formResult
+    },
+    setDefault() {
+      const list = this.toArr(this.options)
+      this.selected = Array.isArray(this.options) ? [this.options[0].value] : []
+      for (const val of list) {
+        this.refOpera(val.value, 'setDefault')
+        if (this.selected.indexOf(val.value) >= 0) {
+          this.refOpera(val.value, 'choosedChange')
+        } else {
+          this.refOpera(val.value, 'boxDisable')
+        }
       }
     }
   }
-}
+ }
 </script>
 
 <style lang="" scoped>

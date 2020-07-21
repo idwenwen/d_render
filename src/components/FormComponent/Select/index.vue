@@ -1,25 +1,24 @@
 <template>
   <div
     :class="className"
-    class="cus-select__container"
+    class="select__container"
   >
-    <!-- label展示内容 -->
     <span
       v-if="label"
-      class="tab-select__label"
+      class="select__label"
     >
       {{ label + ':' }}
     </span>
 
     <el-select
-      ref="cusSelect"
+      ref="selectMain"
       v-model="selected"
-      :size="'mini'"
-      :placeholder="placeholder"
-      :clearable="true"
-      :disabled="disableSet"
+      :size="size"
+      :placeholder="$attrs['placeholder'] || placeholder"
+      :clearable="clearable"
+      :disabled="disabled"
       :multiple="multiple"
-      v-bind="$props"
+      v-bind="$attrs"
     >
       <el-option
         v-for="(item, index) in opts"
@@ -32,129 +31,101 @@
 </template>
 
 <script>
+import dataFilter from '@/mixin/DataFilters'
+import basicOperation from '@/mixin/BasicOperation'
+import disableCheck from '@/mixin/DisableCheck'
 export default {
-  name: 'CustomSelect',
+  name: 'CusSelection',
+  mixins: [
+    dataFilter,
+    basicOperation,
+    disableCheck
+  ],
   props: {
     options: {
       // eslint-disable-next-line vue/require-prop-type-constructor
       type: Array | Object,
       default: () => []
     },
+    multiple: {
+      type: Boolean,
+      default: false
+    },
     label: {
       type: String,
       default: ''
     },
-    placeholder: {
-      type: String,
-      default: 'Select please'
-    },
-    value: {
-      type: String,
-      default: String
-    },
-    def: {
-      type: Boolean,
-      default: false
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
     className: {
       type: String,
       default: ''
-    },
-    multiple: {
-      type: Boolean,
-      default: false
     }
   },
   data() { 
     return {
+      size: 'mini',
+      clearable: true,
+      placeholder: 'select please',
+
       selected: '',
-      disableSet: false,
-      property: '',
-    }
-  },
-  computed: {
-    opts() {
-      let res = []
-      if (typeof this.options === 'object' && this.property) {
-        const list = Array.isArray(this.property) ? this.property : [this.property]
-        for (const val of list) {
-          if (this.options[val]) {
-            res.push(...this.options[val])
-          }
-        }
-      } else if (Array.isArray(this.options)) {
-        res.push(...this.options)
-      }
-      return res
+      opts: []
     }
   },
   watch: {
-    selected() {
-      this.change()
+    selected: {
+      handler(newValue, oldValue) {
+        if (oldValue || (Array.isArray(oldValue) && oldValue.length !== 0)){
+          this.change(this.selected)
+          this.confirm()
+        }
+      },
+      deep: true
     },
-    property() {
-      this.init()
-    },
-    disabled() {
-      this.disableSet = this.disabled
+    property: {
+      handler() {
+        this.opts = this.propfilter(this.options)
+        this.able()
+        this.setDefault()
+      },
+      deep: true
     }
   },
-  created() {
-    this.init()
+  beforeMount() {
+    this.opts = this.propfilter(this.options)
+    if (this.opts.length === 0) {
+      this.disable()
+    }
   },
   methods: {
-    init() {
-      
-      if (this.opts.length > 0) {
-        const selectedContent = this.value || (this.def ? this.opts[0].value : '')
-        this.disableSet = this.disabled
-        if (this.multiple) {
-          this.selected = []
-          this.selected.push(selectedContent)
-        } else {
-          this.selected = selectedContent
-        }
-      } else {
-        this.disableSet = true
-      }
+    // 预留api
+    able() {
+      this.disabled = this.toArr(this.opts).length === 0
     },
-
     change() {
-      if (this.$listeners['input']) {
-        this.$emit('input', this.selected)
-      }
       this.$emit('change', this.selected)
     },
-
+    confirm() {
+      this.$emit('form', this.selected)
+    },
     reset() {
       this.selected = ''
     },
-
-    confirm() {
+    getParam() {
       return this.selected
     },
-
-    disable() {
-      this.disableSet = true
+    setParam(value) {
+      this.selected = value
     },
-
-    able() {
+    setDefault() {
       if (this.opts.length > 0) {
-        this.disableSet = false
-      } else {
-        this.disableSet = true
+        if (!this.multiple) {
+          this.selected = this.opts[0].value
+        } else {
+          this.selected = [this.opts[0].value]
+        }
       }
-    },
-
-    setProperty(property) {
-      this.property = property
     }
   }
- }
+}
 </script>
 
 <style lang="" scoped>

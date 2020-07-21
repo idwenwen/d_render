@@ -1,6 +1,7 @@
 <script>
+import basicOperation from '@/mixin/BasicOperation'
 export default {
-  name: 'Group',
+  name: 'Cgroup',
   components: {
     ccheckbox: () => import('../Checkbox'),
     cradio: () => import('../Radio'),
@@ -9,29 +10,23 @@ export default {
     cselect: () => import('../Select'),
     cstep: () => import('../Step'),
     ctext: () => import('../Text'),
-    cfilterSelect: () => import('../FiltersSelect'),
-    ctitle: () => import('../Text/Title')
+    cselection: () => import('../Selection'),
+    ctitle: () => import('../Text/Title'),
+    csearch: () => import('../Searching'),
+    cbutton: () => import('../Button')
   },
+  mixins: [
+    basicOperation
+  ],
   props: {
+    // 表单列表内容
     form: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Object | Array,
+      type: Array,
       default: () => []
     },
-    value: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: String | Array,
-      default: () => []
-    },
-    name: {
-      type: String,
-      default: ''
-    },
-    className: {
-      type: String,
-      default: ''
-    },
-    def: {
+
+    // 是否自动设置默认值内容
+    default: {
       type: Boolean,
       default: true
     },
@@ -39,245 +34,261 @@ export default {
       type: Boolean,
       default: false
     },
-    confirmd: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: String | Boolean,
-      default: false
-    },
-    reseted: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: String | Boolean,
-      default: false
-    },
-    toArray: {
-      type: Boolean,
-      default: false
-    },
-    toProperty: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Function | String,
+
+    // 样式内容情况。
+    className: {
+      type: String,
       default: ''
-    }
+    },
+
+    // 是否有确定按键
+    confirmBtn: {
+      // eslint-disable-next-line vue/require-prop-type-constructor
+      type: String | Boolean,
+      default: false
+    },
+    // 是否有重置按键
+    resetBtn: {
+      // eslint-disable-next-line vue/require-prop-type-constructor
+      type: String | Boolean,
+      default: false
+    },
   },
   data() { 
     return {
-      result: {},
+      filtersType: ['filterSelect', 'step', 'checkbox', 'radio'],
+      filterProperty: {},
+      formType: ['input', 'select'],
+      formParam: {},
+      needConnect: ['text', 'title'],
+
       canSend: false,
-      resultNeeded: ['filterSelect', 'step', 'select', 'radio', 'checkbox'],
-      resultCompare: [],
-      connectTo: ['text', 'title']
+      finalList: []
+    }
+  },
+  watch: {
+    filterProperty: {
+      handler() {
+        if (!this.canSend) {
+          if (!this.default) {
+            this.canSend = true
+          } else {
+            for (let i = 0; i < this.finalList.length; i++) {
+              const val = this.finalList[i]
+              if (this.filterProperty.indexOf(val.type) >= 0) {
+                if (!this.filterProperty[val.name || 'comp' + i]) {
+                  this.canSend = false
+                  break
+                }
+              }
+            }
+          }
+        }
+        this.change()
+      },
+      deep: true
+    },
+    formParam: {
+      handler() {
+        if (!this.confirmBtn) {
+          this.confirm()
+        }
+      },
+      deep: true
+    },
+    disabled() {
+      if (this.disabled) {
+        this.disable()
+      } else {
+        this.able()
+      }
+    }
+  },
+  mounted() {
+    if (this.disabled) {
+      this.disable()
     }
   },
   methods: {
-    init() {
-      let index = 0
-      const res =[]
-      for (const val of this.form) {
-        if (this.resultNeeded.indexOf(val.type) >= 0 && (val.def || this.def)) {
-          res.push(val.name || 'comp' + index)
+    connection() {
+      for (let i = 0; i < this.finalList.length; i++) {
+        if (this.needConnect.indexOf(this.form[i].type) >= 0) {
+          this.refOpera('comp' + i, 'format')
         }
-        index ++
       }
-      this.resultCompare = res
     },
-    change() {
-      if (this.def) {
-        if (!this.canSend) {
-          let canSend = true
-          for (let i = 0; i < this.resultCompare; i++) {
-            if (this.result[this.resultCompare[i]] === undefined) {
-              canSend = false
-              break
-            } 
+
+    searching(res) {
+      this.$emit('search', res)
+    },
+
+    getParam() {
+      return this.formParam
+    },
+
+    setDefault() {
+      if (this.default) {
+        for (let i = 0; i < this.finalList.length; i++) {
+          const val = this.finalList[i]
+          if (this.typeChecking(val.type)) {
+            this.refOpera('comp' + i, 'setDefault')
           }
-          this.canSend = canSend
-        }
-        if (this.canSend) {
-          this.updated()
-        }
-      } else {
-        this.updated()
-      }
-    },
-
-    getProperty() {
-      if (this.toArray) {
-        const res = []
-        for (const key in this.result) {
-          if (!Array.isArray(this.result[key])) {
-            res.push(this.result[key])
-          } else {
-            res.push(...this.result[key])
-          }
-        }
-        return res
-      } else if (this.toProperty) {
-        if (typeof this.toProperty === 'string') {
-          return this.result[this.toProperty]
-        } else {
-          return this.toProperty(this.result)
-        }
-      } else {
-        return this.result
-      }
-    },
-
-    updated() {
-      this.$emit('change', this.getProperty(), this.name, this.result)
-    },
-
-    confirm() {
-      return this.result
-    },
-
-    reset() {
-      for (let i = 0; i < this.form.length; i++) {
-        if (this.$refs['comp' + i].reset) {
-          this.$refs['comp' + i].reset()
         }
       }
     },
 
     disable() {
-      for (let i = 0; i < this.form.length; i++) {
-        if (this.$refs['comp' + i].disable) {
-          this.$refs['comp' + i].disable()
-        }
+      for (let i = 0; i < this.finalList.length; i++) {
+        this.refOpera('comp' + i, 'disable')
       }
     },
 
     able() {
-      for (let i = 0; i < this.form.length; i++) {
-        if (this.$refs['comp' + i].able) {
-          this.$refs['comp' + i].able()
-        }
+      for (let i = 0; i < this.finalList.length; i++) {
+        this.refOpera('comp' + i, 'able')
       }
     },
 
-    format(value){
-      for (let i = 0; i < this.form.length; i++) {
-        if (this.connectTo.indexOf(this.form[i].type) >= 0) {
-          if (this.$refs['comp' + i] && this.$refs['comp' + i].format) {
-            this.$refs['comp' + i].format(value)
-          } else if (this.$refs['comp' + i][0] && this.$refs['comp' + i][0].format) {
-            this.$refs['comp' + i][0].format(value)
+    change() {
+      const getProperty = (obj) => {
+        const res = []
+        for (const key in obj) {
+          if (Array.isArray(obj[key])) {
+            res.push(...obj[key])
+          } else {
+            res.push(obj[key])
           }
         }
       }
+      this.$emit('change', getProperty(this.filterProperty))
     },
 
-    searching(content) {
-      this.$emit('search', content)
+    confirm() {
+      this.$emit('form', this.formParam)
     },
 
-    setConnection(conn) {
-      this.format(conn)
+    reset() {
+      for (let i = 0; i < this.finalList.length; i++) {
+        this.refOpera('comp' + i, 'reset')
+      }
     },
 
-    resetBtn(h) {
-      return h(
-        'el-button', {
-          props: {
-            size: 'mini',
-            type: 'primary',
-            round: true,
-          },
-          on: {
-            click: () => {
-              this.reset()
-            }
-          }
-        },
-        [
-          typeof this.reseted === 'string' ? this.reseted : 'reset'
-        ]
-      )
-    },
-    comfirmBtn(h) {
-      return h(
-        'el-button', {
-          props: {
-            size: 'mini',
-            type: 'primary',
-            round: true,
-          },
-          on: {
-            click: () => {
-              this.updated()
-            }
-          }
-        },
-        [
-          typeof this.confirmd === 'string' ? this.confirmd : 'confirm'
-        ]
-      )
-    },
-    searchComp(h, attr) {
-      return h(
-        'cinput', {
-          props: Object.assign({}, attr.props ,{
-            search: true,
-            placeholder: 'searching'
-          }),
-          on: {
-            change: (content) => {
-              this.searching(content)
-            }
-          }
-        }
-      )
-    },
-    comps(h) {
-      const res = []
-      let index = 0
-      for(const val of this.form) {
-        const name = val.name || 'comp' + index
-        let child = null
-        if (val.type === 'search') {
-          child = this.searchComp(h, val)
+    compChange(name, type) {
+      return (res) => {
+        if (this.typeChecking(type)) {
+          this.$set(this.filterProperty, name, res)
         } else {
-          const variable = {
-            props: Object.assign({}, val.props, {
-              disabled: this.disabled,
-              def: this.def
-            }),
-            ref: 'comp' + index,
-            on: {
-              change: (res) => {
-                this.result[name] = res
-                const connect = val.connectTo || []
-                for (const i of connect) {
-                  this.$refs['comp' + i].setProperty(res)
-                }
-                if (!this.confirmd) {
-                  this.change()
-                }
-              }
-            }
-          }
-          child = h(
-            'c' + val.type, variable
-          )
+          this.$set(this.formParam, name, res)
         }
+      }
+    },
+
+    compEvents(name, type, ons) {
+      const res = {}
+      if (this.typeChecking(type) || type === 'group') {
+        res.change = this.compChange(name, type)
+      } 
+      if (!this.typeChecking(type) || type === 'group') {
+        res.form = (data) => {
+          this.$set(this.formParam, name, data)
+        }
+      }
+      res.search = (res) => {
+        this.searching(res)
+      }
+      return Object.assign({}, ons, res)
+    },
+
+    typeChecking(type) {
+      const stats = type.split('-')
+      if (stats.length > 1 && stats[0].match(/^f|filter/)) {
+        return true
+      } else {
+        return false
+      }
+    },
+
+    comps(h, list) {
+      const res = []
+      for(let i = 0; i < list.length; i++) {
+        const val = list[i]
+        const name = val.name || 'comp' + i
+        let child = null
+        const variable = {
+          props: Object.assign({}, val.props),
+          ref: 'comp' + i,
+          on: this.compEvents(name, val.type, val.on)
+        }
+        child = h(
+          this.impling(val.type), variable
+        )
         res.push(child)
-        index ++
       }
       return res
     },
 
+    impling(type) {
+      const stats = type.split('-')
+      if (stats.length > 1) {
+        if (stats[1].match('select')) {
+          return 'cselection'
+        } else {
+          return 'c' + stats[1]
+        }
+      } else {
+        return 'c' + type
+      }
+    },
+
+    addConfirmBtn() {
+      return {
+        type: 'button',
+        props: {
+          label: 'confirm',
+        },
+        on: {
+          click: () => {
+            this.confirm()
+          }
+        }
+      }
+    },
+
+    addResetBtn() {
+      return {
+        type: 'button',
+        props: {
+          label: 'reset'
+        },
+        on: {
+          click: () => {
+            this.reset()
+          }
+        }
+      }
+    },
+
     group(h) {
+      const compList = JSON.parse(JSON.stringify(this.form))
+      if (this.confirmBtn) {
+        compList.push(this.addConfirmBtn())
+      }
+      if (this.resetBtn) {
+        compList.push(this.addResetBtn())
+      }
+      this.finalList = compList
       return h(
         'section', {
           'class': 'group__container ' + this.className
         },
-        this.comps(h)
+        this.comps(h, compList)
       )
     }
   },
   render(h) {
     return this.group(h)
   }
- }
+}
 </script>
 
 <style lang="" scoped>

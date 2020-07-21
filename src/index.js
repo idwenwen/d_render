@@ -12,12 +12,15 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import location from 'element-ui/lib/locale/lang/zh-CN'
 
-import App from './App.vue'
+// import App from './App.vue'
+// import main from './main.vue'
+// import box from './checkbox.vue'
+import Form from './Form.vue'
 
 Vue.use(ElementUI, { location })
 new Vue({
   el: '#app',
   store,
   router,
-  render: h => h(App)
+  render: h => h(Form)
 })

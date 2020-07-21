@@ -3,7 +3,6 @@
     :class="className"
     class="step__container"
   >
-    <span class="step__title">Step</span>
     <div class="step__main">
       <span
         v-for="(item, index) in options"
@@ -26,10 +25,6 @@ export default {
       type: Array,
       default: () => []
     },
-    multiple: {
-      type: Boolean,
-      default: false
-    },
     className: {
       type: String,
       default: ''
@@ -37,44 +32,39 @@ export default {
   },
   data() { 
     return {
-      selected: []
+      selected: ''
     }
   },
-  created() {
-    this.init()
+  watch: {
+    selected() {
+      this.change()
+      this.confirm()
+    }
   },
   methods: {
-    init() {
-      this.selected.push(this.options[0].value)
-      this.change()
-    },
     change() {
-      const list = Array.isArray(this.selected) ? [...this.selected] : [this.selected]
-      if (this.$listeners['input']) {
-        this.$emit('input', list)
-      } else {
-        this.$emit('change', list)
-      }
+      this.$emit('change', this.selected)
+    },
+    confirm() {
+      this.$emit('change', this.selected)
     },
     stepChange(item) {
-      const index = this.selected.indexOf(item.value)
-      if (index >= 0) {
-        this.selected.splice(index, 1)
-      } else {
-        this.selected.push(item.value)
-      }
-      this.change()
+      this.selected = item.value
     },
     stepChoosed(item) {
-      for (const val of this.selected) {
-        if (val === item.value) {
-          return true
-        }
+      return item.value === this.selected
+    },
+    toStep(row) {
+      if (row >= this.options.length) {
+        this.selected = this.options[this.options.length].value
+      } else if (row <= 0) {
+        this.selected = this.options[0].value
+      } else {
+        this.selected = this.options[row - 1].value
       }
-      return false
     }
   }
- }
+}
 </script>
 
 <style lang="" scoped>

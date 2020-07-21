@@ -1,115 +1,90 @@
 <template>
   <div
     :class="className"
-    class="cus-input__container"
+    class="input__container"
   >
     <!-- label展示内容 -->
     <span
       v-if="label"
-      class="tab-input__label"
-    >
+      class="input__label"
+    > 
       {{ label + ':' }}
     </span>
 
     <el-input
       ref="cusInput"
       v-model="inputed"
-      :size="'mini'"
-      :placeholder="placeholder"
-      :clearable="true"
-      :disabled="disableSet"
+      :size="size"
+      :placeholder="$attrs['placeholder'] || placeholder"
+      :clearable="clearable"
+      :disabled="disabled"
       v-bind="$props"
-      @change="change"
+      @change="contentChange"
     >
-      <i
-        v-if="search"
-        slot="suffix"
-        class="el-icon-search"
-      />
+      <template slot="suffix">
+        <slot name="suffix" />
+      </template>
     </el-input>
   </div>
 </template>
 
 <script>
+import basicOperation from '@/mixin/BasicOperation'
+import disableCheck from '@/mixin/DisableCheck'
 export default {
-  name: 'CustomSelect',
+  name: 'CusInput',
+  mixins: [
+    basicOperation,
+    disableCheck
+  ],
   props: {
     label: {
       type: String,
       default: ''
     },
-    placeholder: {
+    className: {
       type: String,
       default: ''
     },
-    value: {
-      type: String,
-      default: String
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    search: {
-      type: Boolean,
-      default: false
-    },
-    className: {
-      type: String,
+    format: {
+      // eslint-disable-next-line vue/require-prop-type-constructor
+      type: String | Object,
       default: ''
     }
   },
   data() { 
     return {
-      inputed: '',
-      disableSet: false
+      size: 'mini',
+      clearable: true,
+      placeholder: '',
+
+      inputed: ''
     }
   },
   watch: {
     inputed() {
-      this.inputEve()
-    },
-    value() {
-      this.inputed = this.value
-    },
-    disabled() {
-      this.disableSet = this.disabled
+      // todo: format
     }
   },
-  created() {
-    this.init()
-  },
   methods: {
-    init() {
-      this.inputed = this.value 
-      this.disableSet = this.disabled
-      if (this.def && !this.search) {
-        this.change()
-      }
-    },
-
     change() {
       this.$emit('change', this.inputed)
     },
-
-    inputEve() {
-      this.$emit('input', this.inputed)
-    },
-
-    reset() {
-      this.inputed = ''
-    },
-
     confirm() {
+      this.$emit('form', this.inputed)
+    },
+    contentChange() {
+      this.change()
+      this.confirm()
+    },
+    getParam() {
       return this.inputed
     },
-
-    disable() {
-      this.disableSet = true
+    setParam(value) {
+      this.inputed = value
     },
-
-    able() {
-      this.disableSet = false
+    reset() {
+      this.inputed = ''
     }
   }
  }

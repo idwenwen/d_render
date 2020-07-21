@@ -27,7 +27,7 @@ export default {
   data() { 
     return {
       data: {
-        '{t}': (value) => { return value }
+        '{t}': (table) => { return table.data.length }
       }
     }
   },

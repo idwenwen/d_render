@@ -17,11 +17,6 @@ export default {
       type: Object,
       default: () => {}
     },
-    value: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: String | Object | Array | Boolean | Number,
-      default: ''
-    },
     className: {
       type: String,
       default: ''
@@ -29,14 +24,18 @@ export default {
   },
   data() {
     return {
-      val: this.value
+      val: ''
     }
   },
   computed: {
     textContent() {
       let res = this.content
       for (const key in this.data) {
-        const rep = typeof this.data[key] === 'function' ? this.data[key](this.val) : this.data[key]
+        const rep = typeof this.data[key] === 'function'
+          ? (this.val
+            ? this.data[key](this.val)
+            : key)
+          : this.data[key]
         res = res.replace(key, rep)
       }
       return res
