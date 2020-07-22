@@ -11,8 +11,9 @@
         :label="item.label"
         :value="item.value"
         :group="item.group || {}"
-        @change="boxChange(item.value)"
-        @form="boxForm(item.value)"
+        :single="false"
+        @change="boxChange(arguments, item.value)"
+        @form="boxForm(arguments, item.value)"
         @search="boxSearch"
       />
     </el-checkbox-group>
@@ -22,8 +23,8 @@
       :label="options.label"
       :value="options.value"
       :group="options.group || {}"
-      @change="boxChange(options.value)"
-      @form="boxForm(options.value)"
+      @change="boxChange(arguments, options.value)"
+      @form="boxForm(arguments, options.value)"
       @search="boxSearch"
     />
   </section>
@@ -71,24 +72,33 @@ export default {
         this.confirm()
       },
       deep: true
+    },
+    selected: {
+      handler() {
+        const list = this.toArr(this.options)
+        for (const val of list) {
+          if (this.selected.indexOf(val.value) >= 0) {
+            this.refOpera(val.value, 'chooseBox')
+          } else {
+            this.refOpera(val.value, 'unchooseBox')
+          }
+        }
+        this.change()
+      },
+      deep:true
     }
   },
   methods: {
-    boxChange(label) {
-      return (res) => {
-        debugger
-        this.$set(this.propResult, label, res)
-      }
+    boxChange(res, label) {
+      this.$set(this.propResult, label, res[0])
     },
-    boxForm(label) {
-      return (res) => {
-        this.$set(this.formResult, label, res)
-      }
+    boxForm(res, label) {
+      this.$set(this.formResult, label, res[0])
     },
     boxSearch(res) {
       this.$emit('search', res)
     },
-    change() {
+    checkCanSend() {
       if (!this.canSend) {
         let canSend = true
         if (Array.isArray(this.options)) {
@@ -105,15 +115,20 @@ export default {
         }
         this.canSend = canSend
       }
+    },
+    change() {
+      this.checkCanSend()
       if (this.canSend) {
         const getProperty = () => {
           const res = []
           for(const key in this.filterBySelect(this.propResult)) {
-            const val = this.propResult[key]
-            if (Array.isArray(val)) {
-              res.push(...val)
-            } else {
-              res.push(val)
+            if (this.selected.indexOf(key) >= 0){
+              const val = this.propResult[key]
+              if (Array.isArray(val)) {
+                res.push(...val)
+              } else {
+                res.push(val)
+              }
             }
           }
           return res

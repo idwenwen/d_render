@@ -3,7 +3,7 @@
     <el-checkbox
       :label="value"
       :disabled="disabled"
-      @change="choosedChange"
+      @change="choosedCheckbox"
     >
       {{ label }}
     </el-checkbox>
@@ -47,6 +47,10 @@ export default {
       type: Object | Array,
       default: () => {}
     },
+    single: {
+      type: Boolean,
+      default: true
+    },
 
     className: {
       type: String,
@@ -70,8 +74,10 @@ export default {
   methods: {
     boxChange() {
       this.boxDisable() 
-      if (this.choosed && Object.keys(this.group).length === 0) {
-        this.propResult = this.value
+      if (this.choosed) {
+        if (Object.keys(this.group).length === 0) {
+          this.propResult = this.value
+        }
         this.change(this.propResult)
       }
     },
@@ -108,11 +114,22 @@ export default {
       this.refOpera('cusGroup', 'able')
     },
     setDefault() {
+      this.choosed = false
       this.refOpera('cusGroup', 'setDefault')
-      this.change(this.propResult)
+    },
+    choosedCheckbox() {
+      if (this.single) {
+        this.choosedChange()
+      }
     },
     choosedChange() {
       this.choosed = !this.choosed
+    },
+    chooseBox() {
+      this.choosed = true
+    },
+    unchooseBox() {
+      this.choosed = false
     }
   }
  }

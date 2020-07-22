@@ -10,7 +10,7 @@
     />
     <component
       :is="multiple ? 'cCheckbox' : 'cRadio'"
-      v-if="boxes.length > 0"
+      v-if="boxes"
       ref="cusBox" 
       :options="boxes"
       @form="boxForm"
@@ -46,11 +46,10 @@ export default {
   },
   data() { 
     return {
-      boxes: [],
-      others: [],
+      boxes: '',
+      others: '',
 
       formResult: {},
-      canSend: false,
 
       midPropResult: [],
       propResult: [],
@@ -152,8 +151,8 @@ export default {
       this.formResult = Object.assign({}, this.formResult, res)
     },
     boxChange(res) {
-      if (this.others.length === 0) {
-        this.formResult = res
+      if (!Array.isArray(this.others) || this.others.length === 0) {
+        this.propResult = res
       } else {
         this.midPropResult = res
       }
@@ -170,29 +169,10 @@ export default {
       })
     },
     confirm() {
-      if (!this.canSend) {
-        if (this.levels > 1) {
-          if (Object.keys(this.formResult).length >= (this.others.length > 0 ? 3 : 2)) {
-            this.canSend = true
-          }
-        } else {
-          if (this.formResult.final) this.canSend = true
-        }
-      }
-      if (this.canSend) {
-        this.$emit('form', this.formResult)
-      }
+      this.$emit('form', this.formResult)
     },
     getParam() {
-      if (!this.canSend) {
-        if (Object.keys(this.formResult).length >= (this.others.length > 0 ? 3 : 2)) {
-          this.canSend = true
-        }
-      }
-      if (this.canSend) {
-        return this.formResult  
-      }
-      return {}
+      return this.formResult
     },
     disable() {
       this.refOpera('cusSelect', 'disable')

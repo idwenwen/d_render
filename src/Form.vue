@@ -10,6 +10,9 @@
     <el-button @click="setDef">
       def
     </el-button>
+    <el-button @click="setFor">
+      format
+    </el-button>
   </div>
 </template>
 
@@ -22,40 +25,46 @@ export default {
   data() { 
     return {
       list: [
-        {
-          type: 'search'
-        },
-        {
-          type: 'select',
-          props: {
-            options: [{
-              label:'check1',
-              value:'check1'
-            },{
-              label:'check2',
-              value:'check2'
-            }],
-            multiple: true
-          }
-        },
-        {
-          type: 'f-select',
-          props: {
-            options: [{
-              label: 'guest',
-              value: 'guest'
-            }, {
-              label: 'host',
-              value: [{
-                label: 'host_1',
-                value: 'host_1'
-              }, {
-                label: 'host_2',
-                value: 'host_2'
-              }]
-            }]
-          }
-        },
+        // {
+        //   type: 'search'
+        // },
+        // {
+        //   type: 'select',
+        //   props: {
+        //     options: [{
+        //       label:'check1',
+        //       value:'check1'
+        //     },{
+        //       label:'check2',
+        //       value:'check2'
+        //     }],
+        //     multiple: true
+        //   }
+        // },
+        // {
+        //   type: 'f-select',
+        //   props: {
+        //     options: [{
+        //       label: 'guest',
+        //       value: [{
+        //         label: 'guest_1',
+        //         value: 'guest_1'
+        //       }, {
+        //         label: 'guest_2',
+        //         value: 'guest_2'
+        //       }]
+        //     }, {
+        //       label: 'host',
+        //       value: [{
+        //         label: 'host_1',
+        //         value: 'host_1'
+        //       }, {
+        //         label: 'host_2',
+        //         value: 'host_2'
+        //       }]
+        //     }]
+        //   }
+        // },
         // {
         //   type: 'f-select',
         //   props: {
@@ -103,15 +112,15 @@ export default {
         // {
         //   type: 'input'
         // },
-        // {
-        //   type: 'text',
-        //   props: {
-        //     content: 'total: {t}',
-        //     data: {
-        //       '{t}': 10
-        //     }
-        //   }
-        // }
+        {
+          type: 'text',
+          props: {
+            content: 'total: {t}',
+            data: {
+              '{t}': (value) => { return value}
+            }
+          }
+        }
       ]
     }
   },
@@ -121,6 +130,9 @@ export default {
     },
     setDef() {
       this.$refs['cusDef'].setDefault()
+    },
+    setFor() {
+      this.$refs['cusDef'].connection(10)
     }
   }
  }

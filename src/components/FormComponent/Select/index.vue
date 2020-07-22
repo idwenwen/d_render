@@ -73,7 +73,8 @@ export default {
   watch: {
     selected: {
       handler(newValue, oldValue) {
-        if (oldValue || (Array.isArray(oldValue) && oldValue.length !== 0)){
+        if (!((newValue === '' || newValue.length === 0) &&
+          (oldValue === '' || oldValue.length === 0))) {
           this.change(this.selected)
           this.confirm()
         }

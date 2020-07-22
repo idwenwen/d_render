@@ -73,18 +73,20 @@ export default {
           if (!this.default) {
             this.canSend = true
           } else {
+            let canSend = true
             for (let i = 0; i < this.finalList.length; i++) {
               const val = this.finalList[i]
-              if (this.filterProperty.indexOf(val.type) >= 0) {
-                if (!this.filterProperty[val.name || 'comp' + i]) {
-                  this.canSend = false
-                  break
-                }
+              if (this.typeChecking(val.type) && !this.filterProperty[val.name || 'comp' + i]) {
+                canSend = false
+                break
               }
             }
+            this.canSend = canSend
           }
         }
-        this.change()
+        if (this.canSend) {
+          this.change()
+        }
       },
       deep: true
     },
@@ -110,10 +112,10 @@ export default {
     }
   },
   methods: {
-    connection() {
+    connection(val) {
       for (let i = 0; i < this.finalList.length; i++) {
-        if (this.needConnect.indexOf(this.form[i].type) >= 0) {
-          this.refOpera('comp' + i, 'format')
+        if (this.needConnect.indexOf(this.finalList[i].type) >= 0) {
+          this.refOpera('comp' + i, 'format', val)
         }
       }
     },
@@ -159,6 +161,7 @@ export default {
             res.push(obj[key])
           }
         }
+        return res
       }
       this.$emit('change', getProperty(this.filterProperty))
     },
@@ -209,6 +212,7 @@ export default {
     },
 
     comps(h, list) {
+      debugger
       const res = []
       for(let i = 0; i < list.length; i++) {
         const val = list[i]
@@ -269,7 +273,7 @@ export default {
     },
 
     group(h) {
-      const compList = JSON.parse(JSON.stringify(this.form))
+      const compList = [...this.form]
       if (this.confirmBtn) {
         compList.push(this.addConfirmBtn())
       }

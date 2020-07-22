@@ -2,7 +2,7 @@
   <span
     :class="className"
     class="text__content"
-  >{{ textContent }}</span>
+  >{{ value }}</span>
 </template>
 
 <script>
@@ -24,10 +24,23 @@ export default {
   },
   data() {
     return {
-      val: ''
+      val: '',
+      value: ''
     }
   },
-  computed: {
+  watch: {
+    val: {
+      handler() {
+        debugger
+        this.textContent()
+      },
+      deep:true
+    }
+  },
+  beforeMount() {
+    this.textContent()
+  },
+  methods: {
     textContent() {
       let res = this.content
       for (const key in this.data) {
@@ -38,18 +51,8 @@ export default {
           : this.data[key]
         res = res.replace(key, rep)
       }
-      return res
-    }
-  },
-  watch: {
-    value: {
-      handler() {
-        this.val = this.value
-      },
-      deep:true
-    }
-  },
-  methods: {
+      this.value = res
+    },
     format(val) {
       this.val = val
     }

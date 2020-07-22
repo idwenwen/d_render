@@ -62,6 +62,9 @@ export default {
       } else {
         this.selected = this.options[row - 1].value
       }
+    },
+    setDefault() {
+      this.toStep(1)
     }
   }
 }

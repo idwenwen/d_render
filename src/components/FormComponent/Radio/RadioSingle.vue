@@ -3,7 +3,7 @@
     <el-radio
       :label="value"
       :disabled="disabled"
-      @change="choosedChange"
+      @change="choosedRadio"
     >
       {{ label }}
     </el-radio>
@@ -45,7 +45,10 @@ export default {
       type: Object | Array,
       default: () => {}
     },
-
+    single: {
+      type: Boolean,
+      default: true
+    },
     className: {
       type: String,
       default: ''
@@ -68,8 +71,10 @@ export default {
   methods: {
     boxChange() {
       this.boxDisable() 
-      if (this.choosed && Object.keys(this.group).length === 0) {
-        this.propResult = this.value
+      if (this.choosed) {
+        if (Object.keys(this.group).length === 0) {
+          this.propResult = this.value
+        }
         this.change(this.propResult)
       }
     },
@@ -106,11 +111,22 @@ export default {
       this.refOpera('cusGroup', 'able')
     },
     setDefault() {
+      this.choosed = false
       this.refOpera('cusGroup', 'setDefault')
-      this.change(this.propResult)
+    },
+    choosedRadio() {
+      if (this.single) {
+        this.choosedChange()
+      }
     },
     choosedChange() {
       this.choosed = !this.choosed
+    },
+    chooseBox() {
+      this.choosed = true
+    },
+    unchooseBox() {
+      this.choosed = false
     }
   }
  }
