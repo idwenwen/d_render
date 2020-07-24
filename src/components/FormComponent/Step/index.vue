@@ -1,8 +1,5 @@
 <template>
-  <div
-    :class="className"
-    class="step__container"
-  >
+  <div :class="className" class="step__container">
     <div class="step__main">
       <span
         v-for="(item, index) in options"
@@ -10,9 +7,7 @@
         :class="{'step__each-active': stepChoosed(item)}"
         class="step__each"
         @click.stop="stepChange(item)"
-      >
-        {{ item.label }}
-      </span>
+      >{{ item.label }}</span>
     </div>
   </div>
 </template>
@@ -30,7 +25,7 @@ export default {
       default: ''
     }
   },
-  data() { 
+  data() {
     return {
       selected: ''
     }
@@ -71,5 +66,4 @@ export default {
 </script>
 
 <style lang="" scoped>
-
 </style>

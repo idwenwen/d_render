@@ -31,10 +31,9 @@ export default {
   watch: {
     val: {
       handler() {
-        debugger
         this.textContent()
       },
-      deep:true
+      deep: true
     }
   },
   beforeMount() {
@@ -44,16 +43,17 @@ export default {
     textContent() {
       let res = this.content
       for (const key in this.data) {
-        const rep = typeof this.data[key] === 'function'
-          ? (this.val
-            ? this.data[key](this.val)
-            : key)
-          : this.data[key]
+        const rep =
+          typeof this.data[key] === 'function'
+            ? this.val
+              ? this.data[key](this.val)
+              : key
+            : this.data[key]
         res = res.replace(key, rep)
       }
       this.value = res
     },
-    format(val) {
+    linkageOutside(val) {
       this.val = val
     }
   }
@@ -61,5 +61,4 @@ export default {
 </script>
 
 <style lang="" scoped>
-
 </style>

@@ -1,41 +1,14 @@
 <template>
-  <customcol
-    v-bind="$props"
+  <div
+    class="cweight__container"
+    @click.stop="click(cell)"
   >
-    <template
-      slot="header"
-      slot-scope="header"
-    >
-      <slot
-        name="header"
-        :header="header"
-      />
-    </template>
-    <template
-      slot="default"
-      slot-scope="cell"
-    >
-      <div
-        class="cweight__container"
-        @click.stop="click(cell)"
-      >
-        <slot
-          name="prepend"
-          :weight="cell.row[cell.column.property] || 0"
-        />
-        <el-progress
-          :percentage="(cell.row[cell.column.property] || 0) / total"
-          v-bind="$props"
-        />
-        <slot
-          name="append"
-          :weight="cell.row[cell.column.property] || 0"
-        >
-          <span class="cweight__weight">{{ cell.row[cell.column.property] || 0 }}</span>
-        </slot>
-      </div>
-    </template>
-  </customcol>
+    <el-progress
+      :percentage="percentage(cell)"
+      :show-text="showWeight"
+    />
+    <span class="cweight__weight">{{ spanContent(cell) }}</span>
+  </div>
 </template>
 
 <script>
@@ -48,17 +21,31 @@ export default {
     },
     showWeight: {
       type: Boolean,
-      default: true
+      default: false
+    },
+    cell: {
+      type: Object,
+      default: () => {}
     }
   },
   methods: {
-    click(cell) {
-      this.$emit('cell', cell)
+    percentage(cell) {
+      let res =
+        ((typeof cell.row[cell.column.property] === 'number'
+          ? cell.row[cell.column.property]
+          : 0) /
+          this.total) *
+        100
+      if (res > 100) res = 100
+      else if (res < 0) res = 0
+      return res
+    },
+    spanContent(cell) {
+      return cell.row[cell.column.property] || 0
     }
   }
 }
 </script>
 
 <style lang="" scoped>
-
 </style>

@@ -19,7 +19,9 @@ const DataFilter = {
     propfilter(data) {
       if (!Array.isArray(data) && this.property) {
         const res = []
-        const list = Array.isArray(this.property) ? this.property : [this.property]
+        const list = Array.isArray(this.property)
+          ? this.property
+          : (this.property ? [this.property] : [])
         for (const val of list) {
           if (data[val]) {
             if (Array.isArray(data[val])) {

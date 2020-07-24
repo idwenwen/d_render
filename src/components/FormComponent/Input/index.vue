@@ -1,15 +1,7 @@
 <template>
-  <div
-    :class="className"
-    class="input__container"
-  >
+  <div :class="className" class="input__container">
     <!-- label展示内容 -->
-    <span
-      v-if="label"
-      class="input__label"
-    > 
-      {{ label + ':' }}
-    </span>
+    <span v-if="label" class="input__label">{{ label + ':' }}</span>
 
     <el-input
       ref="cusInput"
@@ -33,10 +25,7 @@ import basicOperation from '@/mixin/BasicOperation'
 import disableCheck from '@/mixin/DisableCheck'
 export default {
   name: 'CusInput',
-  mixins: [
-    basicOperation,
-    disableCheck
-  ],
+  mixins: [basicOperation, disableCheck],
   props: {
     label: {
       type: String,
@@ -52,7 +41,7 @@ export default {
       default: ''
     }
   },
-  data() { 
+  data() {
     return {
       size: 'mini',
       clearable: true,
@@ -87,9 +76,8 @@ export default {
       this.inputed = ''
     }
   }
- }
+}
 </script>
 
 <style lang="" scoped>
-
 </style>

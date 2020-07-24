@@ -6,9 +6,7 @@
     :disabled="disabled"
     v-bind="$attrs"
     @click.stop="btnClick"
-  >
-    {{ label }}
-  </el-button>
+  >{{ label }}</el-button>
 </template>
 
 <script>
@@ -16,15 +14,19 @@ import basicOperation from '@/mixin/BasicOperation'
 import disableCheck from '@/mixin/DisableCheck'
 export default {
   name: 'CusButton',
-  mixins: [basicOperation,disableCheck],
+  mixins: [basicOperation, disableCheck],
   props: {
     label: {
       type: String,
       default: 'btn',
       round: true
+    },
+    value: {
+      type: String,
+      default: ''
     }
   },
-  data() { 
+  data() {
     return {
       size: 'mini',
       type: 'primary'
@@ -33,11 +35,14 @@ export default {
   methods: {
     btnClick() {
       this.$emit('click')
+      if (this.value) {
+        this.$emit('change', this.value)
+        this.$emit('form', this.value)
+      }
     }
   }
- }
+}
 </script>
 
 <style lang="" scoped>
-
 </style>

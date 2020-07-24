@@ -1,49 +1,45 @@
 <template>
-  <div
-    v-loading="loading"
-    class="cus-chart__container"
-  >
-    <cus-legend
-      v-if="legend === 'custom'"
-      :choose="chooses()"
-      @update="legendUpdate"
-    />
-    <instance
-      ref="chart"
-      :option="setting"
-    />
-  </div>
+  <cgroup
+    :options="currentGroup"
+  />
 </template>
 
 <script>
+import dataFilter from '@/mixin/DataFilters'
 export default {
-  name: 'CusCharts',
+  name: 'CustomCharts',
   components: {
-    instance: () => import('../EchartsInstance'),
-    cusLegend: () => import('../CustomLegend')
+    cgroup: () => import('../../ComponentGroup')
   },
+  mixins: [
+    dataFilter
+  ],
   props: {
-    option: {
+    setting: {
       type: Object,
       default: () => {}
     },
-    group: {
-      type: Number,
-      default: 1
-    },
-    name: {
-      type: String,
-      default: ''
-    },
-    async: {
+    options: {
       // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Object | Boolean,
-      default: false
+      type: Object | Array,
+      default: () => {}
+    },
+    group: {
+      type: Array,
+      default: () => []
+    },
+    type: {
+      type: String,
+      default: 'line'
     },
     legend: {
       // eslint-disable-next-line vue/require-prop-type-constructor
       type: String | Boolean,
-      default: 'normal'
+      default: false
+    },
+    name: {
+      type: String,
+      default: ''
     },
     zoom: {
       type: Boolean,
@@ -52,110 +48,109 @@ export default {
   },
   data() { 
     return {
-      setting: {}, // 当前chart设置
-      loading: true
+      allOptions: Array.isArray(this.options) ? [...this.options] : Object.assign({}, this.options)
     }
   },
   computed: {
-    chooses() {
-      const choose = []
-      let group = []
-      if (this.option.series.legnth > 0) {
-        for (const val of this.option.series) {
-          group.push(val.name)
-          if (group.length >= this.group) {
-            if(group.length === 1) {
-              choose.push(...group)
-            } else {
-              choose.push(group)
+    currentOptions() {
+      if (!this.property && !Array.isArray(this.allOptions)) {
+        return {}
+      }
+      const series = Array.isArray(this.allOptions)
+        ? Object.assign({}, this.setting, {
+          series: this.allOptions
+        })
+        : this.propfilter(this.allOptions)
+      const setting = JSON.parse(JSON.stringify(this.setting))
+      if (!this.legend || this.legend === 'custom') {
+        delete setting.legend
+      }
+      return Object.assign({}, setting, {
+        series
+      })
+    },
+    currentLegend() {
+      const chooseRes = []
+      if (this.group.length > 0) {
+        for (const item of this.group) {
+          chooseRes.push({
+            group: item,
+            items: []
+          })
+        }
+      }
+      const series = this.currentOptions.series
+      for (const val of series) {
+        if (val.type === this.type) {
+          if (this.group.length > 0) {
+            for (const group of chooseRes) {
+              if (val.name.match(group.group)) {
+                group.item.push({
+                  label: val.name,
+                  value: val.name
+                })
+              }
             }
+          } else {
+            chooseRes.push({
+              label: val.name,
+              value: val.name
+            })
           }
         }
       }
-      return choose
+      return chooseRes
+    },
+    currentGroup() {
+      const options = []
+      const tableSetting = Object.assign({}, this.currentOptions)
+      if (this.legend === 'custom') {
+        options.push(this.setCusLegend())
+      } else if (this.legend && !tableSetting.legend) {
+        this.setLegend(tableSetting)
+      }
+      options.push({
+        type: 'echart',
+        props: {
+          options: tableSetting,
+          zoom: this.zoom
+        }
+      })
+      return options
     }
   },
   watch: {
-    option: {
+    options: {
       handler() {
-        this.init()
+        this.allOptions = Array.isArray(this.options) ? [...this.options] : Object.assign({}, this.options)
       },
       deep: true
     }
   },
-  created() {
-    this.init()
-  },
   methods: {
-    init() {
-      if (this.option.series) {
-        let setting = JSON.parse(JSON.stringify(this.option))
-        setting = this.legendCheck(setting)
-        if (this.legend === 'custom' || !this.legend) {
-          setting.series = []
+    setLegend(tableSetting) {
+      const res = []
+      for (const val of tableSetting.series) {
+        res.push(val.name)
+      }
+      tableSetting.legend = { data: res }
+      return tableSetting
+    },
+
+    setCusLegend() {
+      return {
+          type: 'form',
+          props: {
+            list: [{
+              type: 'legend',
+              props: {
+                choose: this.currentLegend
+              }
+            }]
+          }
         }
-        this.setting = setting
-      } else if (this.async) {
-        this.request()
-      }
-    },
-    hideLegend(option) {
-      if (option.legend) {
-        option.legend.show = false
-      }
-      return option
-    },
-    setLegend(option) {
-      if (!option.legend) {
-        const data = []
-        for (const val of option.series) {
-          data.push(val.name)
-        }
-        option.legend = {
-          data
-        }
-      }
-      return option
-    },
-    legendCheck(setting) {
-      if ((this.legend === 'custom' || !this.legend) && setting.legend) {
-        setting = this.hideLegend(setting)
-      } else if ((this.legend === 'normal' || this.legend) && !setting.legend) {
-        setting = this.setLegend(setting)
-      }
-      return setting
-    },
-    legendUpdate(property) {
-      const finalSeries = []
-      for (const val of this.option.series) {
-        if (property[val.name]) {
-          const res = JSON.props(JSON.stringify(val))
-          res.lineStyle = res.lineStyle || {}
-          res.lineStyle.color = property[val.name]
-          finalSeries.push(res)
-        }
-      }
-      this.setting.series = finalSeries
-    },
-    request() {
-      this.$emit('request', this.async, { name: this.name })
-    },
-    refresh() {
-      this.$emit('refresh', this.async, { name: this.name })
-    },
-    getOption() {
-      return this.setting
-    },
-    setOption(value) {
-      this.setting = value
-    },
-    getInstance() {
-      this.$refs['chart'].getInstance()
-    },
-    resize() {
-      this.$refs['chart'].resize()
     }
-  }
+  },
  }
 </script>
 

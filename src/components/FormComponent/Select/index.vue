@@ -1,14 +1,6 @@
 <template>
-  <div
-    :class="className"
-    class="select__container"
-  >
-    <span
-      v-if="label"
-      class="select__label"
-    >
-      {{ label + ':' }}
-    </span>
+  <div :class="className" class="select__container">
+    <span v-if="label" class="select__label">{{ label + ':' }}</span>
 
     <el-select
       ref="selectMain"
@@ -20,12 +12,7 @@
       :multiple="multiple"
       v-bind="$attrs"
     >
-      <el-option
-        v-for="(item, index) in opts"
-        :key="index"
-        :label="item.label"
-        :value="item.value"
-      />
+      <el-option v-for="(item, index) in opts" :key="index" :label="item.label" :value="item.value" />
     </el-select>
   </div>
 </template>
@@ -36,11 +23,7 @@ import basicOperation from '@/mixin/BasicOperation'
 import disableCheck from '@/mixin/DisableCheck'
 export default {
   name: 'CusSelection',
-  mixins: [
-    dataFilter,
-    basicOperation,
-    disableCheck
-  ],
+  mixins: [dataFilter, basicOperation, disableCheck],
   props: {
     options: {
       // eslint-disable-next-line vue/require-prop-type-constructor
@@ -60,7 +43,7 @@ export default {
       default: ''
     }
   },
-  data() { 
+  data() {
     return {
       size: 'mini',
       clearable: true,
@@ -73,8 +56,12 @@ export default {
   watch: {
     selected: {
       handler(newValue, oldValue) {
-        if (!((newValue === '' || newValue.length === 0) &&
-          (oldValue === '' || oldValue.length === 0))) {
+        if (
+          !(
+            (newValue === '' || newValue.length === 0) &&
+						(oldValue === '' || oldValue.length === 0)
+          )
+        ) {
           this.change(this.selected)
           this.confirm()
         }
@@ -124,11 +111,13 @@ export default {
           this.selected = [this.opts[0].value]
         }
       }
+    },
+    byChange(prop) {
+      this.setProperty(prop)
     }
   }
 }
 </script>
 
 <style lang="" scoped>
-
 </style>

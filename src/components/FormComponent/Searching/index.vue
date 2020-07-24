@@ -1,15 +1,6 @@
 <template>
-  <cinput
-    ref="cusInput"
-    placeholder="searching"
-    @change="valueChange"
-    @keyup.enter="searching"
-  >
-    <i
-      slot="suffix"
-      class="el-icon-search input__search"
-      @click.stop="searching"
-    />
+  <cinput ref="cusInput" placeholder="searching" @change="valueChange" @keyup.enter="searching">
+    <i slot="suffix" class="el-icon-search input__search" @click.stop="searching" />
   </cinput>
 </template>
 
@@ -21,10 +12,8 @@ export default {
   components: {
     cinput
   },
-  mixins: [
-    basicOperation
-  ],
-  data() { 
+  mixins: [basicOperation],
+  data() {
     return {
       inputed: ''
     }
@@ -50,9 +39,8 @@ export default {
       this.inputed = value
     }
   }
- }
+}
 </script>
 
 <style lang="" scoped>
-
 </style>

@@ -1,12 +1,6 @@
 <template>
   <div class="box__container">
-    <el-checkbox
-      :label="value"
-      :disabled="disabled"
-      @change="choosedCheckbox"
-    >
-      {{ label }}
-    </el-checkbox>
+    <el-checkbox :label="value" :disabled="disabled" @change="choosedCheckbox">{{ label }}</el-checkbox>
     <groups
       v-if="Object.keys(group).length > 0"
       ref="cusGroup"
@@ -29,10 +23,7 @@ export default {
   components: {
     groups: () => import('../Group')
   },
-  mixins: [
-    basicOperation,
-    disableCheck
-  ],
+  mixins: [basicOperation, disableCheck],
   props: {
     label: {
       type: String,
@@ -57,7 +48,7 @@ export default {
       default: ''
     }
   },
-  data() { 
+  data() {
     return {
       choosed: false,
       propResult: '',
@@ -73,7 +64,7 @@ export default {
   },
   methods: {
     boxChange() {
-      this.boxDisable() 
+      this.boxDisable()
       if (this.choosed) {
         if (Object.keys(this.group).length === 0) {
           this.propResult = this.value
@@ -84,7 +75,7 @@ export default {
     boxDisable() {
       if (this.choosed && Object.keys(this.group).length !== 0) {
         this.refOpera('cusGroup', 'able')
-      } else if (Object.keys(this.group).length !== 0){
+      } else if (Object.keys(this.group).length !== 0) {
         this.refOpera('cusGroup', 'disable')
       }
     },
@@ -132,9 +123,8 @@ export default {
       this.choosed = false
     }
   }
- }
+}
 </script>
 
 <style lang="" scoped>
-
 </style>

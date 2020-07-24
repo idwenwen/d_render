@@ -1,185 +1,145 @@
 <script>
+import spanMethod from './mixins/SpanMethod'
+import dataSort from './mixins/DataSort'
+import dataFormat from './mixins/DataFormat'
+import cellClass from './mixins/CellClass'
+import tableSearch from './mixins/CellClass'
+import clink from '../CustomColumn/Linking'
+import ceditor from '../CustomColumn/Editor'
+import cweight from '../CustomColumn/Weight'
 export default {
-  name: 'Origin',
+  name: 'OriginTable',
   components: {
-    'column': () => import('../CustomColumn/Custom'),
-    'editor': () => import('../CustomColumn/Editor'),
-    'link': () => import('../CustomColumn/Linking'),
-    'weigth': () => import('../CustomColumn/Weight')
+    clink,
+    ceditor,
+    cweight
   },
+  mixins: [spanMethod, dataSort, dataFormat, cellClass, tableSearch],
   props: {
+    // 表数据
     data: {
       type: Array,
       default: () => []
     },
+    // 表头内容
     header: {
       type: Array,
       default: () => []
     },
-    attrs: {
-      type: Object,
-      default: () => []
-    },
+    // 表格数据是否自动合并
     combine: {
       type: Boolean,
       default: false
     },
+    // 空数据内容格式化
     nullFormat: {
       type: String,
       default: '-'
     },
+    // 0数据内容格式化
     zeroFormatter: {
       type: String,
       default: '-'
     },
+    // 是否使用科学计数法
     toExp: {
       type: Boolean,
       default: true
     },
+    // 小数后保留多少位。
     size: {
       // eslint-disable-next-line vue/require-prop-type-constructor
       type: Number | Boolean,
       default: 6
     }
   },
-  data() { 
+  data() {
     return {
-      currentTableData: [...this.data],
+      currentTableData: [],
       tableEvents: ['sort-change'],
-      currentSortColumn: '',
-      currentOrder: ''
+      presetHeaderType: {
+        link: 'clink',
+        editor: 'ceditor',
+        weight: 'cweight'
+      },
+      defaultHeaderType: 'ccustom',
+      DEF_TABLE_ATTR: {},
+      DEF_COLUMN_ATTR: {
+        minWidth: 120,
+        showOverflowTooltip: true
+      },
+      hasWeight: -1
     }
   },
   watch: {
     data: {
       handler() {
-        this.init()
-      }
+        this.currentTableData = this.checkData(this.data)
+        this.sortChange({
+          column: this.currentSortColumn,
+          order: this.currentOrder
+        })
+      },
+      deep: true
+    },
+    header: {
+      handler() {
+        this.checkWeight(this.header)
+      },
+      deep: true
     }
   },
-  create() {
-    this.init()
+  mounted() {
+    this.currentTableData = this.checkData(this.data)
+    this.checkWeight(this.header)
+    this.sortChange({
+      column: this.defaultSortColumn,
+      order: this.defaultOrder
+    })
   },
   methods: {
-    init() {
-      this.sortChange({column: this.currentSortColumn, order: this.currentOrder})
+    checkWeight(li) {
+      for (let i = li.length - 1; i >= 0; i--) {
+        const val = li[i]
+        if (val.type === 'weight') {
+          this.defaultSortColumn = { property: li[i].prop }
+          this.defaultOrder = 'descending'
+          this.hasWeight = i
+          break
+        }
+      }
     },
 
-    replaceOrigin(val, ori, to) {
-      const res = JSON.parse(JSON.stringify(val))
-      const content = val.match(ori)
-      if (content) {
-        const replaceTo = to(content[0])
-        return res.replace(ori, replaceTo)
-      } else {
-        return res
-      }
+    searchInTable(content, col) {
+      this.search(this.currentTableData, content, col)
     },
 
     setCurrentRow(row) {
       this.$refs['cTable'][0].setCurrentRow(row)
     },
 
-    // todo: 待验证
-    sortChange({column, order}) {
-      this.currentSortColumn = column
-      this.currentOrder = order
-      let currentTableData = [...this.data]
-      if (column && order) {
-        const compareVal = (val1, val2) => {
-          return val1 > val2 ? 1 : -1
-        }
-        if (order !== null) {
-          currentTableData.sort((a, b) => {
-            const aVal = a[column.property]
-            const bVal = b[column.property]
-            if (bVal === '-') {
-              return -1
-            } else if (aVal === '-') {
-              return 1
-            } else {
-              return compareVal(aVal, bVal)
-            }
-          })
-        }
-      }
-      this.currentTableData = currentTableData
-    },
-    
-    // todo: 待验证
-    spanMethod({column, rowIndex}) {
-      // 如果combine为true的情况，则本列内容自动归并
-      if (this.combine) {
-        const needCompare = []
-        const compareRow = (row1, row2, compareCol) => {
-          for (const val of compareCol) {
-            if (row1[val] !== row2[val]) {
-              return false
-            }
-          }
-          return true
-        }
-        const getHeaders = (list) => {
-          const headers = []
-          for(const val of list) {
-            if (val.children) {
-              headers.push(...getHeaders(val.children))
-            } else {
-              headers.push(val)
-            }
-          }
-          return headers
-        }
-        let findInTable = false
-        const headers = getHeaders(this.header)
-        const ctd = this.currentTableData
-        for (const val of headers) {
-          needCompare.unshift(val.prop)
-          if (val.prop === column.property) {
-            findInTable = true
-            break
-          }
-        }
-        if(findInTable) {
-          if (ctd[rowIndex - 1] && compareRow(ctd[rowIndex], ctd[rowIndex - 1], needCompare)) {
-            return {
-              rowspan: 0,
-              colspan: 0
-            }
-          } else {
-            let row = 1
-            while(ctd[rowIndex + row] && compareRow(ctd[rowIndex], ctd[rowIndex + row], needCompare)) {
-              row += 1
-            }
-            return {
-              rowspan: row,
-              colspan: 1
-            }
-          }
-        }
-        return {
-          rowspan: 1,
-          colspan: 1
-        }
-      }
+    sortChange({ column, order }) {
+      this.currentTableData = this.sortMethod(
+        this.currentTableData,
+        column,
+        order
+      )
     },
 
-    cellClassName({row, column}) {
-      let cellClass = 'ctable__cell'
-      if (column.label === 'index' || row._deep) {
-        cellClass += ' ctabel__cell-deep'
+    replaceOrigin(str, rep, to) {
+      let res = str
+      while (res.match(rep)) {
+        const fto = to(res.match(rep)[0])
+        res = res.replace(rep, fto)
       }
-      if (row[column.property + '_disable']) {
-        cellClass += ' ctable__cell-disable'
-      }
-      return cellClass
+      return res
     },
 
     events(events) {
       const res = {}
       for (const val of events) {
         res[val] = (...args) => {
-          const name = this.replaceOrigin(val, /-[a-z]/, (str) => {
+          const name = this.replaceOrigin(val, /-[a-z]/, str => {
             return str.replace('-', '').toUpperCase()
           })
           if (this.$listeners[name]) {
@@ -192,121 +152,103 @@ export default {
       return res
     },
 
-    checkData(datas) {
-      const res = JSON.parse(JSON.stringify(datas))
-      for (const val of res) {
-        for (const key in val) {
-          if (typeof val[key] === 'number') {
-            const data = val[key].toString().split('.')
-            if (data[1] && data[1].length > 6 && this.size) {
-              const size = typeof this.size === 'number' ? this.size : 6
-              val[key] = parseFloat(val[key].toFixed(size))
+    eachColumn(h, attrs) {
+      let childEle = []
+      if (attrs.children) {
+        childEle = this.columns(h, attrs.children)
+      }
+      const props = Object.assign({}, attrs)
+      if (['selection', 'index', 'expand'].indexOf(props.type) < 0) {
+        delete props.type
+      }
+      delete props.children
+      delete props.on
+      const variable = {
+        props: Object.assign(
+          {
+            columnKey: attrs.prop || attrs.label
+          },
+          this.DEF_COLUMN_ATTR,
+          props
+        ),
+        on: (() => {
+          const res = attrs.on || {}
+          for (const key in this.$listeners) {
+            if (key.match(/^column-/)) {
+              res[key.replace('column-', '')] = this.$listeners[key]
             }
-            if (data[0].replace('/[-+]/', '').length >= 8) {
-              val[key] = val[key].toExponential()
-            }
-            if (val[key] === 0) {
-              val[key] = this.zeroFormatter
-            }
-          } else if (val[key] === '' || val[key] === null) {
-            val[key] = this.nullFormat
+          }
+          return res
+        })()
+      }
+      if (this.presetHeaderType[attrs.type]) {
+        variable.scopedSlots = {
+          default: cell => {
+            return h(this.presetHeaderType[attrs.type], {
+              props: Object.assign({ cell }, props),
+              on: attrs.on || {}
+            })
           }
         }
       }
-      return res
+      return h('el-table-column', variable, childEle)
     },
 
     columns(h, columns) {
       const cols = []
-      columns.forEach((item, index) => {
-        if (item.children) {
-          cols.push(h(
-            'column', {
-              props: Object.assign({}, 
-                this.DEF_COLUMN_ATTR,
-                item.props
-              )
-            },
-            this.columns(h, item.children)
-          ))
-        } else {
-          cols.push(h(
-            item.type || 'column', {
-              props: Object.assign({
-                  columnKey: 'col' + index
-                }, 
-                this.DEF_COLUMN_ATTR,
-                item.props
-              ),
-              scopedSlots: (() => {
-                const res = {}
-                for (const key in this.$scopedSlots) {
-                  if (key !== 'appned') {
-                    res[key] = this.$scopedSlots[key]
-                  }
-                }
-                if (item.slot) {
-                  for (const key in item.slot) {
-                    res[key] = item.slot[key](h)
-                  }
-                }
-                return res
-              })(),
-              on: (() => {
-                const res = item.on || {}
-                for (const key in this.$listeners) {
-                  if (key.match(/^column-/)) {
-                    res[key.replace('column-', '')] = this.$listeners[key]
-                  }
-                }
-                return res
-              })()
-            }
-          ))
-        }
+      columns.forEach(item => {
+        cols.push(this.eachColumn(h, item))
       })
       return cols
     },
 
+    filtersHeader(list) {
+      const li = JSON.parse(JSON.stringify(list))
+      if (this.hasWeight >= 0) {
+        const weightProp = list[this.hasWeight].prop
+        let biggest = 0
+        for (const val of this.currentTableData) {
+          if (
+            typeof val[weightProp] === 'number' &&
+						val[weightProp] > biggest
+          ) {
+            biggest = val[weightProp]
+          }
+        }
+        if (!li[this.hasWeight].total || li[this.hasWeight].total < biggest) {
+          li[this.hasWeight].total = biggest
+        }
+      }
+      return list
+    },
+
     table(h) {
-      return h(
-        'el-table', {
-          props: Object.assign({},
-            this.DEF_TABLE_ATTR,
-            { 
-              data: this.checkData(this.currentTableData),
-              spanMethod: this.combine ? this.spanMethod : () => {
-                return {
-                  rowspan: 1,
-                  colspan: 1
-                }
-              },
-              cellClassName: this.cellClassName,
-              headerCellClassName: 'ctable__header-cell'
-            },
-            this.attrs
-          ),
-          ref: 'cTable',
-          on: (() => {
-            const res = this.events(this.tableEvents)
-            for (const key in this.$listeners) {
-              if (!key.match(/^column-/)) {
-                res[key] = this.$listeners[key]
-              }
+      const variable = {
+        props: Object.assign({}, this.DEF_TABLE_ATTR, {
+          data: this.currentTableData,
+          spanMethod: this.defaultSpanMethod(),
+          cellClassName: this.cellClassName,
+          headerCellClassName: 'ctable__header-cell'
+        }),
+        ref: 'cusTable',
+        on: (() => {
+          const res = this.events(this.tableEvents)
+          for (const key in this.$listeners) {
+            if (!key.match(/^column-/)) {
+              res[key] = this.$listeners[key]
             }
-            return res
-          })()
-        },
-        this.columns(h, this.header)
-      )
+          }
+          return res
+        })()
+      }
+      return h('el-table', variable, this.columns(h, this.header))
     }
   },
   render(h) {
     return this.table(h)
   }
- }
+}
 </script>
 
 <style lang="" scoped>
-
 </style>

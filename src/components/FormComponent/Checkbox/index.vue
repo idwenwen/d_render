@@ -1,9 +1,6 @@
 <template>
   <section>
-    <el-checkbox-group
-      v-if="Array.isArray(options)"
-      v-model="selected"
-    >
+    <el-checkbox-group v-if="Array.isArray(options)" v-model="selected">
       <c-box
         v-for="(item, index) in options"
         :key="index"
@@ -37,9 +34,7 @@ export default {
   components: {
     cBox: () => import('./CheckboxSingle')
   },
-  mixins: [
-    basicOperation
-  ],
+  mixins: [basicOperation],
   props: {
     options: {
       // eslint-disable-next-line vue/require-prop-type-constructor
@@ -52,7 +47,7 @@ export default {
       default: false
     }
   },
-  data() { 
+  data() {
     return {
       propResult: {},
       formResult: {},
@@ -85,7 +80,7 @@ export default {
         }
         this.change()
       },
-      deep:true
+      deep: true
     }
   },
   methods: {
@@ -121,8 +116,8 @@ export default {
       if (this.canSend) {
         const getProperty = () => {
           const res = []
-          for(const key in this.filterBySelect(this.propResult)) {
-            if (this.selected.indexOf(key) >= 0){
+          for (const key in this.filterBySelect(this.propResult)) {
+            if (this.selected.indexOf(key) >= 0) {
               const val = this.propResult[key]
               if (Array.isArray(val)) {
                 res.push(...val)
@@ -177,9 +172,8 @@ export default {
       }
     }
   }
- }
+}
 </script>
 
 <style lang="" scoped>
-
 </style>

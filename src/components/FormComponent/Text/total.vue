@@ -1,10 +1,5 @@
 <template>
-  <ctext
-    ref="cusText"
-    :content="content"
-    :data="data"
-    :value="value"
-  />
+  <ctext ref="cusText" :content="content" :data="data" :value="value" />
 </template>
 
 <script>
@@ -24,21 +19,22 @@ export default {
       default: 0
     }
   },
-  data() { 
+  data() {
     return {
       data: {
-        '{t}': (table) => { return table.data.length }
+        '{t}': table => {
+          return table.data.length
+        }
       }
     }
   },
   methods: {
-    format(value) {
+    linkageOutside(value) {
       this.$refs['cusText'].format(value)
     }
   }
- }
+}
 </script>
 
 <style lang="" scoped>
-
 </style>

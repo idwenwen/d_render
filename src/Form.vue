@@ -132,7 +132,7 @@ export default {
       this.$refs['cusDef'].setDefault()
     },
     setFor() {
-      this.$refs['cusDef'].connection(10)
+      this.$refs['cusDef'].linkageChange(10)
     }
   }
  }

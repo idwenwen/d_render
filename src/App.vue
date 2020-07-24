@@ -97,15 +97,15 @@ export default {
             },
             {
               label: 'variable',
-              valur: 'variable'
+              value: 'variable'
             },
             {
               label: 'woe',
-              valur: 'woe'
+              value: 'woe'
             },
             {
               label: 'iv',
-              valur: 'iv'
+              value: 'iv'
             }
           ]
         }

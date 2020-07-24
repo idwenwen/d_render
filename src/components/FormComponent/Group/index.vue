@@ -15,9 +15,7 @@ export default {
     csearch: () => import('../Searching'),
     cbutton: () => import('../Button')
   },
-  mixins: [
-    basicOperation
-  ],
+  mixins: [basicOperation],
   props: {
     // 表单列表内容
     form: {
@@ -52,9 +50,9 @@ export default {
       // eslint-disable-next-line vue/require-prop-type-constructor
       type: String | Boolean,
       default: false
-    },
+    }
   },
-  data() { 
+  data() {
     return {
       filtersType: ['filterSelect', 'step', 'checkbox', 'radio'],
       filterProperty: {},
@@ -76,7 +74,10 @@ export default {
             let canSend = true
             for (let i = 0; i < this.finalList.length; i++) {
               const val = this.finalList[i]
-              if (this.typeChecking(val.type) && !this.filterProperty[val.name || 'comp' + i]) {
+              if (
+                this.typeChecking(val.type) &&
+								!this.filterProperty[val.name || 'comp' + i]
+              ) {
                 canSend = false
                 break
               }
@@ -112,10 +113,10 @@ export default {
     }
   },
   methods: {
-    connection(val) {
+    linkageOutside(val) {
       for (let i = 0; i < this.finalList.length; i++) {
         if (this.needConnect.indexOf(this.finalList[i].type) >= 0) {
-          this.refOpera('comp' + i, 'format', val)
+          this.refOpera('comp' + i, 'linkageOutside', val.param)
         }
       }
     },
@@ -152,7 +153,7 @@ export default {
     },
 
     change() {
-      const getProperty = (obj) => {
+      const getProperty = obj => {
         const res = []
         for (const key in obj) {
           if (Array.isArray(obj[key])) {
@@ -177,7 +178,7 @@ export default {
     },
 
     compChange(name, type) {
-      return (res) => {
+      return res => {
         if (this.typeChecking(type)) {
           this.$set(this.filterProperty, name, res)
         } else {
@@ -186,17 +187,42 @@ export default {
       }
     },
 
-    compEvents(name, type, ons) {
+    connectTo(list, connect, operation, param) {
+      const li = this.toArr(connect)
+      for (const val of li) {
+        let name = ''
+        if (typeof val === 'number') {
+          const item = list[val]
+          name = item.name || 'comp' + val
+        } else {
+          name = val
+        }
+        this.refOpera(name, 'by' + operation, param)
+      }
+    },
+
+    compEvents(list, name, type, ons, connect) {
       const res = {}
       if (this.typeChecking(type) || type === 'group') {
-        res.change = this.compChange(name, type)
-      } 
-      if (!this.typeChecking(type) || type === 'group') {
-        res.form = (data) => {
-          this.$set(this.formParam, name, data)
+        res.change = (res) => {
+          this.compChange(name, type)(res)
+          this.connectTo(
+            list,
+            connect,
+            'Change',
+            this.typeChecking(type)
+              ? this.filterProperty[name]
+              : this.formParam[name]
+          )
         }
       }
-      res.search = (res) => {
+      if (!this.typeChecking(type) || type === 'group') {
+        res.form = data => {
+          this.$set(this.formParam, name, data)
+          this.connectTo(list, connect, 'Form', this.formParam[name])
+        }
+      }
+      res.search = res => {
         this.searching(res)
       }
       return Object.assign({}, ons, res)
@@ -212,20 +238,17 @@ export default {
     },
 
     comps(h, list) {
-      debugger
       const res = []
-      for(let i = 0; i < list.length; i++) {
+      for (let i = 0; i < list.length; i++) {
         const val = list[i]
         const name = val.name || 'comp' + i
         let child = null
         const variable = {
           props: Object.assign({}, val.props),
           ref: 'comp' + i,
-          on: this.compEvents(name, val.type, val.on)
+          on: this.compEvents(list, name, val.type, val.on, val.connect)
         }
-        child = h(
-          this.impling(val.type), variable
-        )
+        child = h(this.impling(val.type), variable)
         res.push(child)
       }
       return res
@@ -248,7 +271,7 @@ export default {
       return {
         type: 'button',
         props: {
-          label: 'confirm',
+          label: 'confirm'
         },
         on: {
           click: () => {
@@ -282,8 +305,9 @@ export default {
       }
       this.finalList = compList
       return h(
-        'section', {
-          'class': 'group__container ' + this.className
+        'section',
+        {
+          class: 'group__container ' + this.className
         },
         this.comps(h, compList)
       )
@@ -296,5 +320,4 @@ export default {
 </script>
 
 <style lang="" scoped>
-
 </style>

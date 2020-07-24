@@ -1,31 +1,3 @@
-<template>
-  <el-table-column
-    :min-width="$attrs['minWidth'] || minWidth"
-    :show-overflow-tooltip="$attrs['showOverflowTooltip'] || showOverflowTooltip"
-    v-bind="$props"
-  >
-    <template
-      slot="header"
-      slot-scope="header"
-    >
-      <slot
-        name="header"
-        :header="header"
-      >
-        {{ header.column.label }}
-      </slot>
-    </template>
-    <template
-      slot="default"
-      slot-scope="cell"
-    >
-      <slot :cell="cell">
-        {{ cell.row[cell.columns.property] }}
-      </slot>
-    </template>
-  </el-table-column>
-</template>
-
 <script>
 export default {
   name: 'CustomCol',
@@ -35,10 +7,35 @@ export default {
       minWidth: 120,
       showOverflowTooltip: true
     }
+  },
+  methods: {
+    column(h) {
+      const variable = {
+        props: Object.assign(
+          {
+            minWidth: this.minWidth,
+            showOverflowTooltip: this.showOverflowTooltip
+          },
+          this.$attrs
+        ),
+        scopedSlots: {
+          default: cell => {
+            if (this.$scopedSlots['default']) {
+              return this.$scopedSlots['default'](cell)
+            } else {
+              return cell.row[cell.column.property]
+            }
+          }
+        }
+      }
+      return h('el-table-column', variable)
+    }
+  },
+  render(h) {
+    return this.column(h)
   }
 }
 </script>
 
 <style lang="" scoped>
-
 </style>

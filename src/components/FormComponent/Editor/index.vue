@@ -1,54 +1,36 @@
 <template>
-  <section
-    :class="className"
-    class="editor__container"
-  >
+  <section :class="className" class="editor__container">
     <div class="editor_edit">
       <slot
+        :operation="{
+          toDisplay:toDisplay,
+          disabled: disabledSet
+        }"
         name="prepend"
-        :operation="{
-          toDisplay:toDisplay,
-          disabled: disabledSet
-        }"
       />
-      <cinput
-        v-model="editorContent"
-        :disabled="disabledSet"
-      />
+      <cinput v-model="editorContent" :disabled="disabledSet" />
       <slot
-        name="append"
         :operation="{
           toDisplay:toDisplay,
           disabled: disabledSet
         }"
+        name="append"
       >
-        <i
-          class="el-icon-success editor__btn"
-          @click="toDisplay(true)"
-        />
-        <i
-          class="el-icon-failed editor__btn"
-          @click="toDisplay(false)"
-        />
+        <i class="el-icon-success editor__btn" @click="toDisplay(true)" />
+        <i class="el-icon-failed editor__btn" @click="toDisplay(false)" />
       </slot>
     </div>
-    <div 
-      v-show="!showEditor"
-      class="editor__display"
-    >
+    <div v-show="!showEditor" class="editor__display">
       <slot
-        name="content"
         :content="{
           content: displayContent,
           toEditor: toEditor,
           disabled: disabledSet
         }"
+        name="content"
       >
         <span class="editor__display-text">{{ displayContent }}</span>
-        <i
-          class="el-icon-editor editor__btn"
-          @click="toEditor"
-        />
+        <i class="el-icon-editor editor__btn" @click="toEditor" />
       </slot>
     </div>
   </section>
@@ -78,7 +60,7 @@ export default {
       default: ''
     }
   },
-  data() { 
+  data() {
     return {
       editorContent: '',
       displayContent: '',
@@ -135,9 +117,8 @@ export default {
       this.disabledSet = true
     }
   }
- }
+}
 </script>
 
 <style lang="" scoped>
-
 </style>

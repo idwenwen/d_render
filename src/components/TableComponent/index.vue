@@ -1,7 +1,6 @@
 <template>
   <page-table
     ref="cusTable"
-    v-loading="loading"
     :data="currentData"
     :header="currentHeader"
     :async="false"
@@ -28,7 +27,7 @@ export default {
     data: {
       // eslint-disable-next-line vue/require-prop-type-constructor
       type: Object | Array,
-      default:() => []
+      default: () => []
     },
     async: {
       // eslint-disable-next-line vue/require-prop-type-constructor
@@ -45,23 +44,24 @@ export default {
     },
     total: {
       type: Number,
-      default:10
+      default: 10
     }
   },
-  data() { 
+  data() {
     return {
-      property: '',
-      loading: true
+      property: ''
     }
   },
   computed: {
     currentHeader() {
       if (Array.isArray(this.header)) {
-        return [...this.header]
+        return this.header
       }
       const dis = []
       const cols = [...this.header.columns]
-      const list = Array.isArray(this.property) ? this.property : [this.property]
+      const list = Array.isArray(this.property)
+        ? this.property
+        : [this.property]
       for (const val of list) {
         if (this.header.disabled && this.header.disabled[val]) {
           dis.push(...this.header.disabled[val])
@@ -82,10 +82,11 @@ export default {
         return this.data
       }
       const dataList = []
-      const list = Array.isArray(this.property) ? this.property : [this.property]
+      const list = Array.isArray(this.property)
+        ? this.property
+        : [this.property]
       for (const val of list) {
-        if (this.data[val])
-          dataList.push(...this.data[val])
+        if (this.data[val]) dataList.push(...this.data[val])
       }
       return dataList
     }
@@ -96,7 +97,6 @@ export default {
     }
   },
   methods: {
-
     request(...tableParam) {
       this.request('request', ...tableParam)
     },
@@ -106,10 +106,17 @@ export default {
     },
 
     change(param) {
-      this.$emit('change', Object.assign({
-        data: this.currentData,
-        header: this.currentHeader
-      }, param), this.name)
+      this.$emit(
+        'change',
+        Object.assign(
+          {
+            data: this.currentData,
+            header: this.currentHeader
+          },
+          param
+        ),
+        this.name
+      )
     },
 
     tableChange(tableParam) {
@@ -126,9 +133,8 @@ export default {
       }
     }
   }
- }
+}
 </script>
 
 <style lang="" scoped>
-
 </style>

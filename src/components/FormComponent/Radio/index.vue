@@ -1,9 +1,6 @@
 <template>
   <section>
-    <el-radio-group
-      v-if="Array.isArray(options)"
-      v-model="selected"
-    >
+    <el-radio-group v-if="Array.isArray(options)" v-model="selected">
       <c-box
         v-for="(item, index) in options"
         :key="index"
@@ -37,10 +34,8 @@ export default {
   components: {
     cBox: () => import('./RadioSingle')
   },
-  mixins: [
-    basicOperation
-    ],
-   props: {
+  mixins: [basicOperation],
+  props: {
     options: {
       // eslint-disable-next-line vue/require-prop-type-constructor
       type: Array | Object,
@@ -52,7 +47,7 @@ export default {
       default: false
     }
   },
-  data() { 
+  data() {
     return {
       propResult: {},
       formResult: {},
@@ -85,7 +80,7 @@ export default {
         }
         this.change()
       },
-      deep:true
+      deep: true
     }
   },
   methods: {
@@ -121,7 +116,7 @@ export default {
       if (this.canSend) {
         const getProperty = () => {
           const res = []
-          for(const key in this.filterBySelect(this.propResult)) {
+          for (const key in this.filterBySelect(this.propResult)) {
             if (key === this.selected) {
               const val = this.propResult[key]
               if (Array.isArray(val)) {
@@ -176,9 +171,8 @@ export default {
       }
     }
   }
- }
+}
 </script>
 
 <style lang="" scoped>
-
 </style>

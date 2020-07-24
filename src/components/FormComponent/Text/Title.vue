@@ -1,8 +1,5 @@
 <template>
-  <span
-    class="cus-title"
-    @click.stop="clicked"
-  >{{ title }}</span>
+  <span class="cus-title" @click.stop="clicked">{{ title }}</span>
 </template>
 
 <script>
@@ -19,9 +16,8 @@ export default {
       this.$emit('click', this.title)
     }
   }
- }
+}
 </script>
 
 <style lang="" scoped>
-
 </style>

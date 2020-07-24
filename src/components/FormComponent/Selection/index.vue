@@ -9,9 +9,9 @@
       @form="selectForm"
     />
     <component
-      :is="multiple ? 'cCheckbox' : 'cRadio'"
       v-if="boxes"
-      ref="cusBox" 
+      ref="cusBox"
+      :is="(multiple ? 'cCheckbox' : 'cRadio')"
       :options="boxes"
       @form="boxForm"
       @change="boxChange"
@@ -30,10 +30,7 @@ export default {
     cCheckbox: () => import('../Checkbox'),
     cRadio: () => import('../Radio')
   },
-  mixins: [
-    dataFilter,
-    basicOperation
-  ],
+  mixins: [dataFilter, basicOperation],
   props: {
     options: {
       type: Array,
@@ -41,10 +38,10 @@ export default {
     },
     multiple: {
       type: Boolean,
-      default:false
+      default: false
     }
   },
-  data() { 
+  data() {
     return {
       boxes: '',
       others: '',
@@ -80,7 +77,7 @@ export default {
         if (Array.isArray(val.value) && Array.isArray(val.value[0].value)) {
           levels = 3
         } else if (Array.isArray(val.value)) {
-          levels = 2 > levels ? 2 : levels
+          levels = levels < 2 ? 2 : levels
         }
       }
       this.levels = levels
@@ -110,7 +107,10 @@ export default {
                 ]
               }
             })
-          } else if (Array.isArray(val.value) && !Array.isArray(val.value[0].value)) {
+          } else if (
+            Array.isArray(val.value) &&
+						!Array.isArray(val.value[0].value)
+          ) {
             if (levels === 3) {
               otherSelection[val.label] = val.value
               res.push({
@@ -187,9 +187,8 @@ export default {
       this.refOpera('cusSelect', 'setDefault')
     }
   }
- }
+}
 </script>
 
 <style lang="" scoped>
-
 </style>
