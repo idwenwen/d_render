@@ -6,7 +6,9 @@
     :disabled="disabled"
     v-bind="$attrs"
     @click.stop="btnClick"
-  >{{ label }}</el-button>
+  >
+    {{ label }}
+  </el-button>
 </template>
 
 <script>
@@ -29,7 +31,8 @@ export default {
   data() {
     return {
       size: 'mini',
-      type: 'primary'
+      type: 'primary',
+      round: true
     }
   },
   methods: {

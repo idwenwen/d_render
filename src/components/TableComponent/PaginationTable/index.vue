@@ -294,7 +294,7 @@ export default {
     },
 
     linkageChange(param) {
-      this.setProperty(param.param)
+      this.setProperty(param)
       this.change()
     },
 

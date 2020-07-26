@@ -132,7 +132,12 @@ export default {
   },
   computed: {
     filterLimit() {
-      const limits = this.filters === 'number' ? this.filters : 12
+      const checkBigger = (len) => {
+        return  this.currentList.length >= len ? len : this.currentList.length
+      }
+      const limits = (typeof this.filters === 'number')
+        ? checkBigger(this.filters)
+        : checkBigger(12)
       return Math.floor(limits / this.currentList[0].length)
     }
   },
@@ -151,7 +156,7 @@ export default {
   methods: {
     toDisplay() {
       const res = []
-      const originList = [...this.options]
+      const originList = [...this.choose]
       for (const val of originList) {
         const middle = []
         const list = Array.isArray(val) ? val : [val]
@@ -212,7 +217,7 @@ export default {
       const list = this.currentList[index]
       list.forEach((item, index) => {
         if (index === 0 && this.filters) {
-          this.selectedColor.push(this.chooseColor[0][index].indexOf(item.color))
+          this.selectedColor.push(this.chooseColor[0].indexOf(item.color))
         }
         item.color = this.unchooseColor[this.colorSelect(this.unchooseColor.length, index)]
       })
@@ -278,7 +283,9 @@ export default {
 
     setDefault() {
       for (let i = 0; i < this.filterLimit; i++) {
-        this.chooseItem(i, false)
+        if (i < this.currentList.length) {
+          this.chooseItem(i, false)
+        }
       }
       this.request()
     },
@@ -302,25 +309,25 @@ export default {
       const res = []
       for (const val of this.currentList) {
         const group = []
-        for (const item of val) {
-          if (this.unchooseColor.indexOf(item.color) < 0) {
-            if (!form) {
-              res.push(item.value)
-            } else {
-              if (group.indexOf(item.color) < 0) {
-                group.push(item.color)
+        if (this.unchooseColor.indexOf(val[0].color) < 0) {
+          for (const item of val) {
+              if (!form) {
+                res.push(item.value)
+              } else {
+                if (group.indexOf(item.color) < 0) {
+                  group.push(item.color)
+                }
               }
-            }
           }
-        }
-        if (form) {
-          res.push({
-            group: {
-              name: val[0].group,
-              color: group
-            },
-            items: val
-          })
+          if (form) {
+            res.push({
+              group: {
+                name: val[0].group,
+                color: group
+              },
+              items: val
+            })
+          }
         }
       }
       return res

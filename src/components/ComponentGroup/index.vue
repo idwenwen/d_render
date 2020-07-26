@@ -6,7 +6,8 @@ export default {
     cform: () => import('../FormComponent/Group'),
     ctable: () => import('../TableComponent/PaginationTable'),
     cchart: () => import('../ChartComponent/ChartContainer'),
-    cechart: () => import('../ChartComponent/EchartsInstance')
+    cechart: () => import('../ChartComponent/EchartsInstance'),
+    casync: () => import('../AsyncComponent')
   },
   mixins: [basicOperation],
   props: {
@@ -55,13 +56,13 @@ export default {
 
     changeByForm(param, pos) {
       for (let o = pos + 1; o < this.currentList.length; o++) {
-        this.refOpera('comp' + o, 'linkageChange', { param, from: 'form' })
+        this.refOpera('comp' + o, 'linkageChange', param)
       }
     },
 
     changeByOutside(param, pos) {
       for (let o = pos - 1; o >= 0; o--) {
-        this.refOpera('comp' + o, 'linkageOutside', { param, from: 'table' })
+        this.refOpera('comp' + o, 'linkageOutside', param)
       }
     },
     setDefault() {
@@ -99,6 +100,18 @@ export default {
           }
           variable.on.form = formList => {
             this.filterByForm(formList, i)
+          }
+        }
+        if (val.type === 'async') {
+          variable.on.afterRequest = params => {
+            if (params.operation && typeof params.operation === 'function') {
+              const res = {}
+              for (let i = 0; i < this.currentList.length; i++) {
+                const val = this.currentList[i];
+                res[val.name || 'comp' + i] = this.$refs['comp' + i]
+              }
+              params.operation(res, params, this)
+            }
           }
         }
         child.push(

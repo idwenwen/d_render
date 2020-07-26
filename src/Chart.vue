@@ -2,6 +2,7 @@
   <cchart
     :setting="setting"
     :options="series"
+    :legend="'custom'"
   />
 </template>
 

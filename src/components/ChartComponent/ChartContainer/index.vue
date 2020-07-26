@@ -57,9 +57,7 @@ export default {
         return {}
       }
       const series = Array.isArray(this.allOptions)
-        ? Object.assign({}, this.setting, {
-          series: this.allOptions
-        })
+        ? this.allOptions
         : this.propfilter(this.allOptions)
       const setting = JSON.parse(JSON.stringify(this.setting))
       if (!this.legend || this.legend === 'custom') {
@@ -141,8 +139,9 @@ export default {
       return {
           type: 'form',
           props: {
-            list: [{
+            form: [{
               type: 'legend',
+              name: 'legend',
               props: {
                 choose: this.currentLegend
               }

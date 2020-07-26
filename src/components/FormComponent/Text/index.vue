@@ -1,5 +1,6 @@
 <template>
   <span
+    v-show="!hide"
     :class="className"
     class="text__content"
   >{{ value }}</span>
@@ -20,12 +21,17 @@ export default {
     className: {
       type: String,
       default: ''
+    },
+    hidden: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
       val: '',
-      value: ''
+      value: '',
+      hide: this.hidden
     }
   },
   watch: {
@@ -34,6 +40,9 @@ export default {
         this.textContent()
       },
       deep: true
+    },
+    hidden() {
+      this.hide = this.hidden
     }
   },
   beforeMount() {
@@ -55,6 +64,9 @@ export default {
     },
     linkageOutside(val) {
       this.val = val
+    },
+    visiable(bool) {
+      this.hide = !bool
     }
   }
 }

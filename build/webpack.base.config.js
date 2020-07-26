@@ -3,6 +3,7 @@ const friendlyFormatter = require('eslint-friendly-formatter')
 const miniCss = require('mini-css-extract-plugin')
 const vueConfig = require('./vue.config')
 const { VueLoaderPlugin } = require('vue-loader')
+// const babelPolyfill = require('babel-polyfill')
 
 /**
  * 公用webpack打包配置

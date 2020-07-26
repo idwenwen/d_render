@@ -1,5 +1,6 @@
 <script>
 import basicOperation from '@/mixin/BasicOperation'
+import Comp from './components'
 export default {
   name: 'Cgroup',
   components: {
@@ -13,7 +14,8 @@ export default {
     cselection: () => import('../Selection'),
     ctitle: () => import('../Text/Title'),
     csearch: () => import('../Searching'),
-    cbutton: () => import('../Button')
+    cbutton: () => import('../Button'),
+    clegend: () => import('../Legend')
   },
   mixins: [basicOperation],
   props: {
@@ -115,8 +117,9 @@ export default {
   methods: {
     linkageOutside(val) {
       for (let i = 0; i < this.finalList.length; i++) {
+        const item = this.finalList[i]
         if (this.needConnect.indexOf(this.finalList[i].type) >= 0) {
-          this.refOpera('comp' + i, 'linkageOutside', val.param)
+          this.refOpera(item.name || 'comp' + i, 'linkageOutside', val)
         }
       }
     },
@@ -133,22 +136,22 @@ export default {
       if (this.default) {
         for (let i = 0; i < this.finalList.length; i++) {
           const val = this.finalList[i]
-          if (this.typeChecking(val.type)) {
-            this.refOpera('comp' + i, 'setDefault')
-          }
+          this.refOpera(val.name || 'comp' + i, 'setDefault')
         }
       }
     },
 
     disable() {
       for (let i = 0; i < this.finalList.length; i++) {
-        this.refOpera('comp' + i, 'disable')
+        const val = this.finalList[i]
+        this.refOpera(val.name || 'comp' + i, 'disable')
       }
     },
 
     able() {
-      for (let i = 0; i < this.finalList.length; i++) {
-        this.refOpera('comp' + i, 'able')
+      for (let i = 0; i < this.finalList.length; i++) { 
+        const val = this.finalList[i]
+        this.refOpera(val.name || 'comp' + i, 'able')
       }
     },
 
@@ -173,7 +176,8 @@ export default {
 
     reset() {
       for (let i = 0; i < this.finalList.length; i++) {
-        this.refOpera('comp' + i, 'reset')
+        const val = this.finalList[i]
+        this.refOpera(val.name || 'comp' + i, 'reset')
       }
     },
 
@@ -245,7 +249,7 @@ export default {
         let child = null
         const variable = {
           props: Object.assign({}, val.props),
-          ref: 'comp' + i,
+          ref: name,
           on: this.compEvents(list, name, val.type, val.on, val.connect)
         }
         child = h(this.impling(val.type), variable)
@@ -260,10 +264,10 @@ export default {
         if (stats[1].match('select')) {
           return 'cselection'
         } else {
-          return 'c' + stats[1]
+          return Comp.exchangeTo(stats[1])
         }
       } else {
-        return 'c' + type
+        return Comp.exchangeTo(type)
       }
     },
 

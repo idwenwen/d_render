@@ -1,6 +1,6 @@
 <template>
   <div
-    ref="chart"
+    ref="myChart"
     class="charts_container"
   />
 </template>
@@ -31,24 +31,25 @@ export default {
     },
     currentOptions: {
       handler() {
-        this.refresh()
-        this.resize()
+        Promise.resolve(
+          this.refresh()
+        ).then(() => {
+          this.resize()
+        })
       }
     }
   },
-  beforeMount() {
-    this.echartInit()
-  },
   mounted() {
+    this.echartInit()
     this.linkageForm(this.currentFilter)
   },
   methods: {
     echartInit() {
-      this.instance = echarts.init(this.$refs.chart)
+      this.instance = echarts.init(this.$refs['myChart'])
     },
     refresh() {
       if (this.currentOptions.series && Object.keys(this.currentOptions.series).length !== 0) {
-        this.instance.setOption(this.option)
+        this.instance.setOption(this.currentOptions, true)
       }
     },
     resize() {
@@ -59,14 +60,12 @@ export default {
     },
     linkageForm(res) {
       const opts = JSON.parse(JSON.stringify(this.options))
-      if (!res) {
-        return void 0
-      } else {
+      if (res) {
         this.currentFilter = res
         for (let i = 0; i < opts.series.length; i++) {
           const val = opts.series[i];
           let has = false
-          for (const item of this.currentFilter.param) {
+          for (const item of this.currentFilter.legend) {
             if (val.name.match(item.group.name)) {
               has = true
               let initems = false
@@ -81,6 +80,8 @@ export default {
               if (!initems) {
                 val.itemStyle = val.itemStyle || {}
                 val.itemStyle.color = item.group.color[0]
+              } else {
+                break
               }
             }
           }
@@ -96,6 +97,8 @@ export default {
 }
 </script>
 
-<style lang="" scoped>
-
+<style lang="scss" scoped>
+  .charts_container{
+    min-height: 300px;
+  }
 </style>
