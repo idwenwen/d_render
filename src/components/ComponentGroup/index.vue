@@ -65,6 +65,13 @@ export default {
         this.refOpera('comp' + o, 'linkageOutside', param)
       }
     },
+
+    refreshByForm(pos) {
+      for (let o = pos + 1; o < this.currentList.length; o++) {
+        this.refOpera('comp' + o, 'linkageRefresh')
+      }
+    },
+
     setDefault() {
       const res = []
       for (let i = 0; i < this.currentList.length; i++) {
@@ -100,6 +107,10 @@ export default {
           }
           variable.on.form = formList => {
             this.filterByForm(formList, i)
+          }
+          variable.on.refresh = () => {
+            debugger
+            this.refreshByForm(i)
           }
         }
         if (val.type === 'async') {

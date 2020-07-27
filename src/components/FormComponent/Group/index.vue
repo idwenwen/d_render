@@ -15,7 +15,8 @@ export default {
     ctitle: () => import('../Text/Title'),
     csearch: () => import('../Searching'),
     cbutton: () => import('../Button'),
-    clegend: () => import('../Legend')
+    clegend: () => import('../Legend'),
+    crefresh: () => import('../Refresh')
   },
   mixins: [basicOperation],
   props: {
@@ -174,6 +175,11 @@ export default {
       this.$emit('form', this.formParam)
     },
 
+    refreshing() {
+      debugger
+      this.$emit('refresh')
+    },
+
     reset() {
       for (let i = 0; i < this.finalList.length; i++) {
         const val = this.finalList[i]
@@ -224,6 +230,11 @@ export default {
         res.form = data => {
           this.$set(this.formParam, name, data)
           this.connectTo(list, connect, 'Form', this.formParam[name])
+        }
+      }
+      if (type === 'refresh') {
+        res.refresh = () => {
+          this.refreshing()
         }
       }
       res.search = res => {

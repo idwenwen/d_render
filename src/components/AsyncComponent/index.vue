@@ -31,7 +31,13 @@ export default {
       default: () => {}
     },
     afterRequestForParent: {
-      type: Function,
+      // eslint-disable-next-line vue/require-prop-type-constructor
+      type: Function | String,
+      default: () => {}
+    },
+    refresh: {
+      // eslint-disable-next-line vue/require-prop-type-constructor
+      type: Function | String,
       default: () => {}
     }
   },
@@ -39,14 +45,51 @@ export default {
     return {
       cacheData: new Map(),
       displayParam: [],
-      loading: true
+      loading: true,
+      requestParam: Array.isArray(this.options) ? [...this.options] : Object.assign({}, this.options)
     };
+  },
+  computed: {
+    getDataParam() {
+      if (!Array.isArray(this.requestParam)) {
+        return [{
+          name: 'default',
+          opts: this.requestParam
+        }]
+      } else {
+        if (!this.property) {
+          return []
+        } else {
+          const list = Array.isArray(this.property) ? this.property : [this.property]
+          const res = []
+          for (const val of list) {
+            let optres = ''
+            for (const item of this.requestParam) {
+              if (item.name === val) {
+                optres = item
+              }
+            }
+            res.push({
+              name: val,
+              opts: optres
+            })
+          }
+          return res
+        }
+      }
+    }
   },
   watch: {
     property: {
       handler() {
         this.init()
       }
+    },
+    options: {
+      handler() {
+        this.requestParam =  Array.isArray(this.options) ? [...this.options] : Object.assign({}, this.options)
+      },
+      deep: true
     }
   },
   created() {
@@ -57,7 +100,9 @@ export default {
         this.loading = true
         this.combine().then((params) => {
           this.displayParam = params
-          this.loading = false
+          this.$nextTick(() => {
+            this.loading = false
+          })
         })
     },
     async requesting(opt, name) {
@@ -83,37 +128,8 @@ export default {
       return true
     },
 
-    getDataParam() {
-      if (!Array.isArray(this.options)) {
-        return [{
-          name: 'default',
-          opts: this.options
-        }]
-      } else {
-        if (!this.property) {
-          return []
-        } else {
-          const list = Array.isArray(this.property) ? this.property : [this.property]
-          const res = []
-          for (const val of list) {
-            let optres = ''
-            for (const item of this.options) {
-              if (item.name === val) {
-                optres = item
-              }
-            }
-            res.push({
-              name: val,
-              opts: optres
-            })
-          }
-          return res
-        }
-      }
-    },
-
     async combine() {
-      const newParam = this.getDataParam() // 获取当前可能需要展示的内容。
+      const newParam = [...this.getDataParam] // 获取当前可能需要展示的内容。
       // 判定当前的内容有哪一些是需要请求的。
       for (let i = 0; i < newParam.length; i++) {
         const val = newParam[i]
@@ -132,6 +148,45 @@ export default {
 
     linkageChange(res) {
       this.setProperty(res)
+    },
+    async linkageRefresh() {
+      debugger
+      this.loading = true
+      const list = Array.isArray(this.property) ? this.property : this.property ? [this.property] : ['default']
+      for (let i = 0; i < list.length; i++) {
+        const val = list[i];
+        let origin = ''
+        for (const item of this.getDataParam) {
+          if (item.name === val) {
+            origin = item.opts
+            break
+          }
+        }
+        let originData = this.cacheData.get(val)
+        this.cacheData.delete(val)
+        let newRes = ''
+        const params = {
+          name: val,
+          originParam: origin,
+          originData
+        }
+        if (typeof this.refresh === 'string') {
+          newRes = await this[this.refresh](params)
+        } else {
+          newRes = await this.refresh(params)
+        }
+        if (!Array.isArray(this.requestParam)) {
+          this.requestParam = newRes
+        } else {
+          for (let j = 0; j < this.requestParam.length; j++) {
+            const value = this.requestParam[j];
+            if (value.name === val) {
+              this.requestParam.splice(j, 1, Object.assign({}, value, newRes))
+            }
+          }
+        }
+        this.init()
+      }
     }
   }
 }

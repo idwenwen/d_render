@@ -22,20 +22,22 @@ export default {
           }
         },
         {
-        type: 'f-select',
-        props: {
-          options: [
-            {
-              label: 'btn1',
-              value: 't1'
-            },
-            {
-              label: 'btn2',
-              value: 't2'
-            }
-          ]
-        }
-      }],
+          type: 'f-select',
+          props: {
+            options: [
+              {
+                label: 'btn1',
+                value: 't1'
+              },
+              {
+                label: 'btn2',
+                value: 't2'
+              }
+            ]
+          }
+        }, {
+          type: 'refresh'
+        }],
       asyncParam:{
         options: [{
           name: 't1',
@@ -52,7 +54,8 @@ export default {
           method: this.requests,
           transform: (value) => {return value}
         }],
-        afterRequestForParent: this.afterRequestForParent
+        afterRequestForParent: this.afterRequestForParent,
+        refresh: this.refresh
       },
 
       t1: {
@@ -130,6 +133,29 @@ export default {
           }
         ],
         data: []
+      },
+      t3: {
+        header:[
+          {
+            type: 'index',
+            label: 'index'
+          },
+          {
+            label: 'variable',
+            prop: 'variable'
+          },
+          {
+            label: 'iv',
+            prop: 'iv',
+            sortable: true
+          },
+          {
+            label: 'weight',
+            prop: 'weight',
+            total: 100
+          }
+        ],
+        data: []
       }
     };
   },
@@ -152,6 +178,7 @@ export default {
   }, 
   created() {
     this.t2.data = this.initData(15)
+    this.t3.data = this.initData(23)
   },
   methods: {
     initData(val) {
@@ -179,12 +206,15 @@ export default {
           if (type === 't1') {
             res.type = 'chart',
             res.props = this.t1
-          } else {
+          } else if (type === 't2'){
             res.type = 'table',
             res.props = this.t2
+          } else {
+            res.type = 'table',
+            res.props = this.t3
           }
           resolve(res)
-        })
+        }, 1000)
       })
     },
     afterRequestForParent(optionList, param) {
@@ -192,6 +222,18 @@ export default {
         optionList['form'].$refs['testText'].visiable(true)
       }
       return optionList
+    },
+    refresh(param) {
+      debugger
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const res = {}
+          if (param.name === 't1') {
+            res.props = this.t3
+          }
+          resolve(res)
+        }, 1000)
+      })
     }
   }
 
