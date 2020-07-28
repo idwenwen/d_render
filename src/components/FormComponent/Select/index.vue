@@ -119,5 +119,44 @@ export default {
 }
 </script>
 
-<style lang="" scoped>
+<style lang="scss">
+.el-select {
+	max-width: 150px;
+	.el-select__tags {
+		border-radius: 2px;
+		height: 16px;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		& > span {
+			overflow: hidden;
+			display: flex;
+			flex-direction: row;
+		}
+		.el-tag {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			border-radius: 2px;
+			height: 16px;
+			margin-right: 2px;
+			.el-select__tags-text {
+				line-height: 16px;
+			}
+			.el-tag__close {
+				line-height: 16px;
+				margin-top: 0px;
+			}
+		}
+	}
+	.el-input__inner {
+		height: 24px;
+		background-color: #fff;
+		border: 2px solid #ebedf0;
+		border-radius: 2px;
+	}
+	.el-select__caret {
+		line-height: 24px;
+	}
+}
 </style>

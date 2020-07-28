@@ -1,15 +1,8 @@
 <template>
-  <el-link
-    type="primary"
-    @click="refreshing"
-  >
+  <el-link type="primary" @click="refreshing">
     <span class="refresh__container">
-      <i
-        class="el-icon-refresh-right"
-      />
-      <span>
-        refresh
-      </span>
+      <i class="el-icon-refresh-right" />
+      <span>refresh</span>
     </span>
   </el-link>
 </template>
@@ -19,13 +12,11 @@ export default {
   name: 'RefreshBtn',
   methods: {
     refreshing() {
-      debugger
       this.$emit('refresh')
     }
   }
- }
+}
 </script>
 
 <style lang="" scoped>
-
 </style>

@@ -1,7 +1,5 @@
 <template>
-  <cgroup
-    :options="currentGroup"
-  />
+  <cgroup :options="currentGroup" class="chart__container" />
 </template>
 
 <script>
@@ -11,9 +9,7 @@ export default {
   components: {
     cgroup: () => import('../../ComponentGroup')
   },
-  mixins: [
-    dataFilter
-  ],
+  mixins: [dataFilter],
   props: {
     setting: {
       type: Object,
@@ -46,9 +42,11 @@ export default {
       default: false
     }
   },
-  data() { 
+  data() {
     return {
-      allOptions: Array.isArray(this.options) ? [...this.options] : Object.assign({}, this.options)
+      allOptions: Array.isArray(this.options)
+        ? [...this.options]
+        : Object.assign({}, this.options)
     }
   },
   computed: {
@@ -120,7 +118,9 @@ export default {
   watch: {
     options: {
       handler() {
-        this.allOptions = Array.isArray(this.options) ? [...this.options] : Object.assign({}, this.options)
+        this.allOptions = Array.isArray(this.options)
+          ? [...this.options]
+          : Object.assign({}, this.options)
       },
       deep: true
     }
@@ -137,22 +137,23 @@ export default {
 
     setCusLegend() {
       return {
-          type: 'form',
-          props: {
-            form: [{
+        type: 'form',
+        props: {
+          form: [
+            {
               type: 'legend',
               name: 'legend',
               props: {
                 choose: this.currentLegend
               }
-            }]
-          }
+            }
+          ]
         }
+      }
     }
-  },
- }
+  }
+}
 </script>
 
 <style lang="" scoped>
-
 </style>

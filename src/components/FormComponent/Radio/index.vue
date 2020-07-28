@@ -1,6 +1,6 @@
 <template>
   <section>
-    <el-radio-group v-if="Array.isArray(options)" v-model="selected">
+    <el-radio-group v-if="Array.isArray(options)" v-model="selected" class="radio-group__container">
       <c-box
         v-for="(item, index) in options"
         :key="index"
@@ -9,6 +9,7 @@
         :value="item.value"
         :group="item.group || {}"
         :single="false"
+        class="radio-group__box"
         @change="boxChange(arguments, item.value)"
         @form="boxForm(arguments, item.value)"
         @search="boxSearch"
@@ -174,5 +175,15 @@ export default {
 }
 </script>
 
-<style lang="" scoped>
+<style lang="scss" scoped>
+@import '../../../style/position';
+.radio-group__container {
+	@include flex(row, flex-start, center);
+	.radio-group__box {
+		margin-right: 30px;
+	}
+	.radio-group__box:last-child {
+		margin-right: 0px;
+	}
+}
 </style>

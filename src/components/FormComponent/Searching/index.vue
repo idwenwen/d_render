@@ -1,5 +1,10 @@
 <template>
-  <cinput ref="cusInput" placeholder="searching" @change="valueChange" @keyup.enter="searching">
+  <cinput
+    ref="cusInput"
+    placeholder="search variable"
+    @change="valueChange"
+    @keyup.enter="searching"
+  >
     <i slot="suffix" class="el-icon-search input__search" @click.stop="searching" />
   </cinput>
 </template>
@@ -42,5 +47,14 @@ export default {
 }
 </script>
 
-<style lang="" scoped>
+<style lang="scss" scoped>
+.input__search {
+	line-height: 22px;
+	padding-right: 6px;
+	padding-left: 2px;
+	margin-top: 1px;
+	margin-bottom: 1px;
+	background-color: #fff;
+	cursor: pointer;
+}
 </style>

@@ -1,16 +1,14 @@
 <template>
-  <cgroup
-    :options="groupOptions"
-  />
+  <cgroup :options="groupOptions" />
 </template>
 
 <script>
 export default {
-  name: "AsyncTesting",
+  name: 'AsyncTesting',
   components: {
     cgroup: () => import('./components/ComponentGroup')
   },
-  data () {
+  data() {
     return {
       form: [
         {
@@ -35,85 +33,96 @@ export default {
               }
             ]
           }
-        }, {
+        },
+        {
           type: 'refresh'
-        }],
-      asyncParam:{
-        options: [{
-          name: 't1',
-          props: {
-            type: 't1'
+        }
+      ],
+      asyncParam: {
+        options: [
+          {
+            name: 't1',
+            props: {
+              type: 't1'
+            },
+            method: this.requests,
+            transform: value => {
+              return value
+            }
           },
-          method: this.requests,
-          transform: (value) => {return value}
-        }, {
-          name: 't2',
-          props: {
-            type: 't2'
-          },
-          method: this.requests,
-          transform: (value) => {return value}
-        }],
+          {
+            name: 't2',
+            props: {
+              type: 't2'
+            },
+            method: this.requests,
+            transform: value => {
+              return value
+            }
+          }
+        ],
         afterRequestForParent: this.afterRequestForParent,
         refresh: this.refresh
       },
 
       t1: {
         setting: {
-            title: {
-              text: '折线图堆叠'
-            },
-            tooltip: {
-              trigger: 'axis'
-            },
-            grid: {
-              left: '3%',
-              right: '4%',
-              bottom: '3%',
-              containLabel: true
-            },
-            toolbox: {
-              feature: {
-                saveAsImage: {}
-              }
-            },
-            xAxis: {
-              type: 'category',
-              boundaryGap: false,
-              data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-            },
-            yAxis: {
-              type: 'value'
+          title: {
+            text: '折线图堆叠'
+          },
+          tooltip: {
+            trigger: 'axis'
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          toolbox: {
+            feature: {
+              saveAsImage: {}
             }
+          },
+          xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+          },
+          yAxis: {
+            type: 'value'
+          }
         },
-        options: [{
-                name: 'iteration_0',
-                type: 'line',
-                data: [120, 132, 101, 134, 90, 230, 210]
-              },
-              {
-                name: 'iteration_1',
-                type: 'line',
-                data: [220, 182, 191, 234, 290, 330, 310]
-              },
-              {
-                name: 'iteration_2',
-                type: 'line',
-                data: [150, 232, 201, 154, 190, 330, 410]
-              },
-              {
-                name: 'iteration_3',
-                type: 'line',
-                data: [320, 332, 301, 334, 390, 330, 320]
-              },
-              {
-                name: 'iteration_4',
-                type: 'line',
-                data: [820, 932, 901, 934, 1290, 1330, 1320]
-        }]
+        options: [
+          {
+            name: 'iteration_0',
+            type: 'line',
+            data: [120, 132, 101, 134, 90, 230, 210]
+          },
+          {
+            name: 'iteration_1',
+            type: 'line',
+            data: [220, 182, 191, 234, 290, 330, 310]
+          },
+          {
+            name: 'iteration_2',
+            type: 'line',
+            data: [150, 232, 201, 154, 190, 330, 410]
+          },
+          {
+            name: 'iteration_3',
+            type: 'line',
+            data: [320, 332, 301, 334, 390, 330, 320]
+          },
+          {
+            name: 'iteration_4',
+            type: 'line',
+            data: [820, 932, 901, 934, 1290, 1330, 1320]
+          }
+        ]
       },
       t2: {
-        header:[
+        header: [
           {
             type: 'index',
             label: 'index'
@@ -135,7 +144,7 @@ export default {
         data: []
       },
       t3: {
-        header:[
+        header: [
           {
             type: 'index',
             label: 'index'
@@ -157,7 +166,7 @@ export default {
         ],
         data: []
       }
-    };
+    }
   },
   computed: {
     groupOptions() {
@@ -175,7 +184,7 @@ export default {
         }
       ]
     }
-  }, 
+  },
   created() {
     this.t2.data = this.initData(15)
     this.t3.data = this.initData(23)
@@ -200,17 +209,17 @@ export default {
     },
     requests(param) {
       const type = param.type
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         setTimeout(() => {
           const res = {}
           if (type === 't1') {
-            res.type = 'chart',
+            res.type = 'chart'
             res.props = this.t1
-          } else if (type === 't2'){
-            res.type = 'table',
+          } else if (type === 't2') {
+            res.type = 'table'
             res.props = this.t2
           } else {
-            res.type = 'table',
+            res.type = 'table'
             res.props = this.t3
           }
           resolve(res)
@@ -224,8 +233,7 @@ export default {
       return optionList
     },
     refresh(param) {
-      debugger
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         setTimeout(() => {
           const res = {}
           if (param.name === 't1') {
@@ -237,13 +245,11 @@ export default {
     }
   }
 
-  //beforeRouteUpdate (to, from, next){
+  // beforeRouteUpdate (to, from, next){
   //  next();
-  //}
-
+  // }
 }
 </script>
 
 <style scoped>
-
 </style>

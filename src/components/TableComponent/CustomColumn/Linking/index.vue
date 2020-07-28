@@ -6,15 +6,11 @@
       :underline="true"
       :type="type"
       :disabled="disabled"
+      class="link__linking"
       @click.stop="linkClick(item, cell)"
     >
       <slot :cell="cell">
-        <slot
-          :name="item"
-          :cell="cell"
-        >
-          {{ item }}
-        </slot>
+        <slot :name="item" :cell="cell">{{ item }}</slot>
       </slot>
     </el-link>
   </div>
@@ -73,5 +69,12 @@ export default {
 }
 </script>
 
-<style lang="" scoped>
+<style lang="scss" scoped>
+@import '../../../../style/position';
+.link__container {
+	@include flex(row, flex-start, center);
+	.link__linking {
+		margin-left: 10px;
+	}
+}
 </style>

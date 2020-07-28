@@ -6,9 +6,7 @@
     :disabled="disabled"
     v-bind="$attrs"
     @click.stop="btnClick"
-  >
-    {{ label }}
-  </el-button>
+  >{{ label }}</el-button>
 </template>
 
 <script>

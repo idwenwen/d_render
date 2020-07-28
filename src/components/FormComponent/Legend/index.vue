@@ -14,11 +14,7 @@
           class="legend__label"
         >{{ val.label }}</span>
       </div>
-      <div
-        v-if="currentList.length > withOutDialog"
-        class="legend__cp"
-        @click="showDialog"
-      >
+      <div v-if="currentList.length > withOutDialog" class="legend__cp" @click="showDialog">
         <span
           v-for="(item, index) in currentList[0]"
           :key="index"
@@ -27,29 +23,17 @@
         >...</span>
       </div>
       <div class="legend__cp">
-        <i
-          class="el-icon-download"
-          @click.stop="showDialog"
-        />
+        <i class="el-icon-download" @click.stop="showDialog" />
       </div>
     </div>
 
-    <div
-      v-show="dialogShowing"
-      class="legend__dialog"
-    >
+    <div v-show="dialogShowing" class="legend__dialog">
       <header class="legend__d-header">
         <span class="legend__d-text">Total: {{ currentList.length }}</span>
         <span class="legend__d-text">Choose: {{ currentChoosed.length }}</span>
-        <span
-          class="legend__d-clear"
-          @click.stop="clearAll"
-        >Clear</span>
+        <span class="legend__d-clear" @click.stop="clearAll">Clear</span>
         <span class="legend__d-hide">
-          <i
-            class="el-icon-upload"
-            @click.stop="hideDialog"
-          />
+          <i class="el-icon-upload" @click.stop="hideDialog" />
         </span>
       </header>
       <main class="legend__d-main">
@@ -132,12 +116,13 @@ export default {
   },
   computed: {
     filterLimit() {
-      const checkBigger = (len) => {
-        return  this.currentList.length >= len ? len : this.currentList.length
+      const checkBigger = len => {
+        return this.currentList.length >= len ? len : this.currentList.length
       }
-      const limits = (typeof this.filters === 'number')
-        ? checkBigger(this.filters)
-        : checkBigger(12)
+      const limits =
+				typeof this.filters === 'number'
+				  ? checkBigger(this.filters)
+				  : checkBigger(12)
       return Math.floor(limits / this.currentList[0].length)
     }
   },
@@ -169,7 +154,9 @@ export default {
                 label: typeof item === 'string' ? it : it.label,
                 value: typeof item === 'string' ? it : it.value,
                 group: item.group,
-                color: this.unchooseColor[this.colorSelect(this.unchooseColor.length, j)]
+                color: this.unchooseColor[
+                  this.colorSelect(this.unchooseColor.length, j)
+                ]
               })
             }
           } else {
@@ -177,7 +164,9 @@ export default {
               label: typeof item === 'string' ? item : item.label,
               value: typeof item === 'string' ? item : item.value,
               group: typeof item === 'string' ? item : item.value,
-              color: this.unchooseColor[this.colorSelect(this.unchooseColor.length, i)]
+              color: this.unchooseColor[
+                this.colorSelect(this.unchooseColor.length, i)
+              ]
             })
           }
         }
@@ -219,7 +208,9 @@ export default {
         if (index === 0 && this.filters) {
           this.selectedColor.push(this.chooseColor[0].indexOf(item.color))
         }
-        item.color = this.unchooseColor[this.colorSelect(this.unchooseColor.length, index)]
+        item.color = this.unchooseColor[
+          this.colorSelect(this.unchooseColor.length, index)
+        ]
       })
     },
 
@@ -252,9 +243,10 @@ export default {
     },
 
     colorInit() {
-      const limit = this.filterLimit > this.defColor[0].length
-        ? this.defColor[0].length
-        : this.filterLimit
+      const limit =
+				this.filterLimit > this.defColor[0].length
+				  ? this.defColor[0].length
+				  : this.filterLimit
       const res = []
       for (const val of this.defColor) {
         if (this.filters) {
@@ -311,13 +303,13 @@ export default {
         const group = []
         if (this.unchooseColor.indexOf(val[0].color) < 0) {
           for (const item of val) {
-              if (!form) {
-                res.push(item.value)
-              } else {
-                if (group.indexOf(item.color) < 0) {
-                  group.push(item.color)
-                }
+            if (!form) {
+              res.push(item.value)
+            } else {
+              if (group.indexOf(item.color) < 0) {
+                group.push(item.color)
               }
+            }
           }
           if (form) {
             res.push({

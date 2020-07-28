@@ -125,6 +125,12 @@ export default {
       }
     },
 
+    resize() {
+      for (let i = 0; i < this.finalList.length; i++) {
+        this.refOpera('comp' + i, 'resize')
+      }
+    },
+
     searching(res) {
       this.$emit('search', res)
     },
@@ -150,7 +156,7 @@ export default {
     },
 
     able() {
-      for (let i = 0; i < this.finalList.length; i++) { 
+      for (let i = 0; i < this.finalList.length; i++) {
         const val = this.finalList[i]
         this.refOpera(val.name || 'comp' + i, 'able')
       }
@@ -176,7 +182,6 @@ export default {
     },
 
     refreshing() {
-      debugger
       this.$emit('refresh')
     },
 
@@ -214,7 +219,7 @@ export default {
     compEvents(list, name, type, ons, connect) {
       const res = {}
       if (this.typeChecking(type) || type === 'group') {
-        res.change = (res) => {
+        res.change = res => {
           this.compChange(name, type)(res)
           this.connectTo(
             list,
@@ -334,5 +339,5 @@ export default {
 }
 </script>
 
-<style lang="" scoped>
+<style lang="scss" scoped>
 </style>

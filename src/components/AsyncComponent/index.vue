@@ -6,9 +6,7 @@
     }"
     class="async__container"
   >
-    <cgroup
-      :options="displayParam"
-    />
+    <cgroup :options="displayParam" />
   </div>
 </template>
 
@@ -17,13 +15,11 @@
 import dataFilter from '@/mixin/DataFilters'
 import cgroup from '../ComponentGroup'
 export default {
-  name: "CustomAsyncComponent",
+  name: 'CustomAsyncComponent',
   components: {
     cgroup
   },
-  mixins: [
-    dataFilter
-  ],
+  mixins: [dataFilter],
   props: {
     options: {
       // eslint-disable-next-line vue/require-prop-type-constructor
@@ -41,26 +37,32 @@ export default {
       default: () => {}
     }
   },
-  data () {
+  data() {
     return {
       cacheData: new Map(),
       displayParam: [],
       loading: true,
-      requestParam: Array.isArray(this.options) ? [...this.options] : Object.assign({}, this.options)
-    };
+      requestParam: Array.isArray(this.options)
+        ? [...this.options]
+        : Object.assign({}, this.options)
+    }
   },
   computed: {
     getDataParam() {
       if (!Array.isArray(this.requestParam)) {
-        return [{
-          name: 'default',
-          opts: this.requestParam
-        }]
+        return [
+          {
+            name: 'default',
+            opts: this.requestParam
+          }
+        ]
       } else {
         if (!this.property) {
           return []
         } else {
-          const list = Array.isArray(this.property) ? this.property : [this.property]
+          const list = Array.isArray(this.property)
+            ? this.property
+            : [this.property]
           const res = []
           for (const val of list) {
             let optres = ''
@@ -87,7 +89,9 @@ export default {
     },
     options: {
       handler() {
-        this.requestParam =  Array.isArray(this.options) ? [...this.options] : Object.assign({}, this.options)
+        this.requestParam = Array.isArray(this.options)
+          ? [...this.options]
+          : Object.assign({}, this.options)
       },
       deep: true
     }
@@ -97,13 +101,13 @@ export default {
   },
   methods: {
     init() {
-        this.loading = true
-        this.combine().then((params) => {
-          this.displayParam = params
-          this.$nextTick(() => {
-            this.loading = false
-          })
+      this.loading = true
+      this.combine().then(params => {
+        this.displayParam = params
+        this.$nextTick(() => {
+          this.loading = false
         })
+      })
     },
     async requesting(opt, name) {
       let result = ''
@@ -123,7 +127,7 @@ export default {
         name,
         resoponse: result,
         setting: afterTrans,
-        operation: this.afterRequestForParent 
+        operation: this.afterRequestForParent
       })
       return true
     },
@@ -150,11 +154,14 @@ export default {
       this.setProperty(res)
     },
     async linkageRefresh() {
-      debugger
       this.loading = true
-      const list = Array.isArray(this.property) ? this.property : this.property ? [this.property] : ['default']
+      const list = Array.isArray(this.property)
+        ? this.property
+        : this.property
+          ? [this.property]
+          : ['default']
       for (let i = 0; i < list.length; i++) {
-        const val = list[i];
+        const val = list[i]
         let origin = ''
         for (const item of this.getDataParam) {
           if (item.name === val) {
@@ -162,7 +169,7 @@ export default {
             break
           }
         }
-        let originData = this.cacheData.get(val)
+        const originData = this.cacheData.get(val)
         this.cacheData.delete(val)
         let newRes = ''
         const params = {
@@ -179,7 +186,7 @@ export default {
           this.requestParam = newRes
         } else {
           for (let j = 0; j < this.requestParam.length; j++) {
-            const value = this.requestParam[j];
+            const value = this.requestParam[j]
             if (value.name === val) {
               this.requestParam.splice(j, 1, Object.assign({}, value, newRes))
             }
@@ -193,5 +200,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

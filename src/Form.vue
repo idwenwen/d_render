@@ -1,18 +1,8 @@
 <template>
   <div>
-    <c-group
-      ref="cusDef"
-      :form="list"
-      @search="con"
-      @change="con"
-      @form="con"
-    />
-    <el-button @click="setDef">
-      def
-    </el-button>
-    <el-button @click="setFor">
-      format
-    </el-button>
+    <c-group ref="cusDef" :form="list" :default="true" @search="con" @change="con" @form="con" />
+    <el-button @click="setDef">def</el-button>
+    <el-button @click="setFor">format</el-button>
   </div>
 </template>
 
@@ -22,65 +12,101 @@ export default {
   components: {
     cGroup: () => import('./components/FormComponent/Group')
   },
-  data() { 
+  data() {
     return {
       list: [
+        {
+          type: 'search'
+        },
         // {
-        //   type: 'search'
-        // },
-        // {
-        //   type: 'select',
+        //   type: 'f-select',
         //   props: {
-        //     options: [{
-        //       label:'check1',
-        //       value:'check1'
-        //     },{
-        //       label:'check2',
-        //       value:'check2'
-        //     }],
+        //     options: [
+        //       {
+        //         label: 'check1',
+        //         value: 'check1'
+        //       },
+        //       {
+        //         label: 'check2',
+        //         value: 'check2'
+        //       }
+        //     ],
         //     multiple: true
         //   }
         // },
+        {
+          type: 'f-select',
+          props: {
+            options: [
+              {
+                label: 'guest',
+                value: [
+                  {
+                    label: 'guest_1',
+                    value: 'guest_1'
+                  },
+                  {
+                    label: 'guest_2',
+                    value: 'guest_2'
+                  }
+                ]
+              },
+              {
+                label: 'host',
+                value: [
+                  {
+                    label: 'host_1',
+                    value: [
+                      {
+                        label: 'host_1_1',
+                        value: 'host_1_1'
+                      },
+                      {
+                        label: 'host_1_2',
+                        value: 'host_1_2'
+                      }
+                    ]
+                  },
+                  {
+                    label: 'host_2',
+                    value: [
+                      {
+                        label: 'host_2_1',
+                        value: 'host_2_1'
+                      },
+                      {
+                        label: 'host_2_2',
+                        value: 'host_2_2'
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
         // {
         //   type: 'f-select',
         //   props: {
-        //     options: [{
-        //       label: 'guest',
-        //       value: [{
-        //         label: 'guest_1',
-        //         value: 'guest_1'
-        //       }, {
-        //         label: 'guest_2',
-        //         value: 'guest_2'
-        //       }]
-        //     }, {
-        //       label: 'host',
-        //       value: [{
-        //         label: 'host_1',
-        //         value: 'host_1'
-        //       }, {
-        //         label: 'host_2',
-        //         value: 'host_2'
-        //       }]
-        //     }]
-        //   }
-        // },
-        // {
-        //   type: 'f-select',
-        //   props: {
-        //     options: [{
-        //       label: 'aribter',
-        //       value: 'aribter'
-        //     }, {
-        //       label: 'aribter2',
-        //       value: [{
-        //         label: 'aribter_1',
-        //         value: 'aribtert_1'
-        //       }, {
-        //         label: 'aribter_2',
-        //         value: 'aribter_2'
-        //       }]
-        //     }],
+        //     options: [
+        //       {
+        //         label: 'aribter',
+        //         value: 'aribter'
+        //       },
+        //       {
+        //         label: 'aribter2',
+        //         value: [
+        //           {
+        //             label: 'aribter_1',
+        //             value: 'aribtert_1'
+        //           },
+        //           {
+        //             label: 'aribter_2',
+        //             value: 'aribter_2'
+        //           }
+        //         ]
+        //       }
+        //     ],
         //     multiple: true
         //   }
         // },
@@ -109,16 +135,24 @@ export default {
         //     }]
         //   }
         // },
-        // {
-        //   type: 'input'
-        // },
+        {
+          type: 'input'
+        },
         {
           type: 'text',
           props: {
             content: 'total: {t}',
             data: {
-              '{t}': (value) => { return value}
+              '{t}': value => {
+                return value
+              }
             }
+          }
+        },
+        {
+          type: 'title',
+          props: {
+            title: 'preformance importance'
           }
         }
       ]
@@ -132,12 +166,11 @@ export default {
       this.$refs['cusDef'].setDefault()
     },
     setFor() {
-      this.$refs['cusDef'].linkageChange(10)
+      this.$refs['cusDef'].linkageOutside(10)
     }
   }
- }
+}
 </script>
 
 <style lang="" scoped>
-
 </style>

@@ -1,6 +1,6 @@
 const DataFilter = {
   data() {
-    return  {
+    return {
       property: ''
     }
   },

@@ -1,8 +1,5 @@
 <template>
-  <section
-    v-loading="tableLoading"
-    class="ctable__container"
-  >
+  <section v-loading="tableLoading" class="ctable__container">
     <div class="ctable__table">
       <origin-table
         ref="originTable"
@@ -19,7 +16,7 @@
       <el-pagination
         ref="pagination"
         :layout="'prev, pager, next'"
-        :page-size="pageSize"
+        :page-size="(pageSize < 0 || typeof pageSize === 'string') ? currentTotal : pageSize"
         :total="currentTotal"
         :current-page.sync="currentPage"
         :background="true"

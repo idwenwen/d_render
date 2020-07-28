@@ -4,7 +4,10 @@ function needCompareHeader(list, current) {
     if (val.children) {
       headers.push(...needCompareHeader(val.children))
     } else if (val.prop === current || val.label === current) {
+      headers.push(val.prop)
       break
+    } else if (val.type === 'index' || val.type === 'selection') {
+      continue
     } else {
       headers.push(val.prop)
     }
@@ -21,6 +24,42 @@ function compareRows(row1, row2, compareCol) {
   return true
 }
 
+function totalSpanMethod(row, column, list, end) {
+  if (row[column.property] && row[column.property].match(/(total|Total|summary|Summary)/)) {
+    let colOrigin = 1
+    for (const val of list) {
+      if (!val.prop || !row[val.prop]) {
+        colOrigin++
+      } else if (row[val.prop].match(/(total|Total|summary|Summary)/)) {
+        break
+      }
+    }
+    return {
+      rowspan: 1,
+      colspan: colOrigin
+    }
+  }
+  let has = false
+  for (let i = end - 1; i >= 0; i--) {
+    const val = list[i]
+    if (row[val.prop] && row[val.prop].match(/(total|Total|summary|Summary)/)) {
+      has = true
+      break
+    }
+  }
+  if (!has && (!column.property || !row[column.property])) {
+    return {
+      rowspan: 0,
+      colspan: 0
+    }
+  } else {
+    return {
+      rowspan: 1,
+      colspan: 1
+    }
+  }
+}
+
 const SpanMethods = {
   methods: {
     notCombine() {
@@ -29,8 +68,17 @@ const SpanMethods = {
         colspan: 1
       }
     },
-    doCombine({ column, rowIndex }) {
-      const compared = needCompareHeader(this.headers, column.property)
+    doCombine({ row, column, rowIndex, columnIndex }) {
+      if (row._total) {
+        return totalSpanMethod(row, column, this.header, columnIndex)
+      }
+      if (column.type === 'index' || column.type === 'selection') {
+        return {
+          rowspan: 1,
+          colspan: 1
+        }
+      }
+      const compared = needCompareHeader(this.header, column.property)
       const ctd = this.currentTableData
       if (rowIndex > 0 && compareRows(ctd[rowIndex - 1], ctd[rowIndex], compared)) {
         return {
@@ -39,7 +87,7 @@ const SpanMethods = {
         }
       } else {
         let combineRowCount = 1
-        while (ctd[rowIndex + combineRowCount] && compareRows(ctd[rowIndex + combineRowCount], ctd[rowIndex], compared)) {
+        while (ctd[rowIndex + combineRowCount] && compareRows(ctd[rowIndex + combineRowCount], ctd[rowIndex], compared) && !ctd[rowIndex + combineRowCount]._total) {
           combineRowCount++
         }
         return {

@@ -1,8 +1,5 @@
 <template>
-  <editor
-    :value="cell.row[cell.column.property]"
-    @change="change"
-  />
+  <editor :value="cell.row[cell.column.property]" @change="change" />
 </template>
 
 <script>

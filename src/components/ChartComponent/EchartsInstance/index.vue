@@ -1,8 +1,5 @@
 <template>
-  <div
-    ref="myChart"
-    class="charts_container"
-  />
+  <div ref="myChart" class="charts_container" />
 </template>
 
 <script>
@@ -15,7 +12,7 @@ export default {
       default: () => {}
     }
   },
-  data() { 
+  data() {
     return {
       instance: '',
       currentOptions: {},
@@ -31,9 +28,7 @@ export default {
     },
     currentOptions: {
       handler() {
-        Promise.resolve(
-          this.refresh()
-        ).then(() => {
+        Promise.resolve(this.refresh()).then(() => {
           this.resize()
         })
       }
@@ -48,7 +43,10 @@ export default {
       this.instance = echarts.init(this.$refs['myChart'])
     },
     refresh() {
-      if (this.currentOptions.series && Object.keys(this.currentOptions.series).length !== 0) {
+      if (
+        this.currentOptions.series &&
+				Object.keys(this.currentOptions.series).length !== 0
+      ) {
         this.instance.setOption(this.currentOptions, true)
       }
     },
@@ -63,7 +61,7 @@ export default {
       if (res) {
         this.currentFilter = res
         for (let i = 0; i < opts.series.length; i++) {
-          const val = opts.series[i];
+          const val = opts.series[i]
           let has = false
           for (const item of this.currentFilter.legend) {
             if (val.name.match(item.group.name)) {
@@ -98,7 +96,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .charts_container{
-    min-height: 300px;
-  }
+.charts_container {
+	min-height: 300px;
+}
 </style>

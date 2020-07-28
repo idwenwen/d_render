@@ -72,5 +72,12 @@ export default {
 }
 </script>
 
-<style lang="" scoped>
+<style lang="scss" scoped>
+.text__content {
+	font-size: 16px;
+	font-weight: bold;
+	color: #7f7d8e;
+	line-height: 24px;
+	margin-bottom: 12px;
+}
 </style>

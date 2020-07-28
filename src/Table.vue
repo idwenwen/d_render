@@ -1,16 +1,8 @@
 <template>
   <div>
-    <c-table
-      ref="cusTable"
-      :header="header"
-      :data="data"
-    />
-    <el-button @click="setProp('check1')">
-      check1
-    </el-button>
-    <el-button @click="setProp('check2')">
-      check2
-    </el-button>
+    <c-table ref="cusTable" :header="header" :data="data" :page-size="'all'" />
+    <el-button @click="setProp('check1')">check1</el-button>
+    <el-button @click="setProp('check2')">check2</el-button>
   </div>
 </template>
 
@@ -21,30 +13,31 @@ export default {
   components: {
     cTable
   },
-  data() { 
+  data() {
     return {
-      header: 
-      {
+      header: {
         disable: {
-          'check1': ['operation']
+          check1: ['operation']
         },
-        header:[
+        header: [
           {
             type: 'index',
             label: 'index'
           },
           {
             label: 'variable',
-            prop: 'variable'
-          },
-          {
-            label: 'iv',
-            prop: 'iv',
-            sortable: true
+            prop: 'variable',
+            normal_deep: true
           },
           {
             label: 'woe',
             prop: 'woe'
+          },
+          {
+            label: 'iv',
+            prop: 'iv',
+            sortable: true,
+            much_deep: true
           },
           {
             label: 'sum',
@@ -100,26 +93,32 @@ export default {
       const res = []
       for (let i = 0; i < val; i++) {
         res.push({
-          variable: 'x' + i,
-          woe: Math.random() * 1000,
+          variable: 'x' + Math.floor(i / 2),
+          woe: Math.floor(i / 2) * 100 + 10,
           iv: Math.random() * 100,
           weight: 10 * i,
           operation: 'check | testClick',
           notes: 'checking' + i,
           sum: Math.random() * 100,
           tpr: Math.random() * 100,
-          fpr: Math.random() * 100
+          fpr: Math.random() * 100,
+          tpr_disable: true
         })
       }
+      res.push({
+        sum: 'total',
+        tpr: 'all',
+        fpr: 'all',
+        _total: true
+      })
       return res
     },
     setProp(check) {
       this.$refs['cusTable'].linkageChange(check)
     }
   }
- }
+}
 </script>
 
 <style lang="" scoped>
-
 </style>

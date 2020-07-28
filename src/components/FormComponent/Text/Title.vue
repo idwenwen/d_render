@@ -1,5 +1,5 @@
 <template>
-  <span class="cus-title" @click.stop="clicked">{{ title }}</span>
+  <h3 class="cus-title" @click.stop="clicked">{{ title }}</h3>
 </template>
 
 <script>
@@ -19,5 +19,9 @@ export default {
 }
 </script>
 
-<style lang="" scoped>
+<style lang="scss" scoped>
+.cus-title {
+	font-size: 24px !important;
+	color: #3e4052 !important;
+}
 </style>

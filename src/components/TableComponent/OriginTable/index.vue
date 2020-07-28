@@ -29,7 +29,7 @@ export default {
     // 表格数据是否自动合并
     combine: {
       type: Boolean,
-      default: false
+      default: true
     },
     // 空数据内容格式化
     nullFormat: {
@@ -63,9 +63,12 @@ export default {
         weight: 'cweight'
       },
       defaultHeaderType: 'ccustom',
-      DEF_TABLE_ATTR: {},
+      DEF_TABLE_ATTR: {
+        emptyText: 'No data',
+        elementLoadingText: 'Loading',
+        size: 'mini'
+      },
       DEF_COLUMN_ATTR: {
-        minWidth: 120,
         showOverflowTooltip: true
       },
       hasWeight: -1
@@ -163,14 +166,15 @@ export default {
       }
       delete props.children
       delete props.on
+      const obj = {
+        columnKey: attrs.prop || attrs.label
+      }
+      if (props.type === 'index') {
+        obj.width = '70'
+        obj.align = 'center'
+      }
       const variable = {
-        props: Object.assign(
-          {
-            columnKey: attrs.prop || attrs.label
-          },
-          this.DEF_COLUMN_ATTR,
-          props
-        ),
+        props: Object.assign(obj, this.DEF_COLUMN_ATTR, props),
         on: (() => {
           const res = attrs.on || {}
           for (const key in this.$listeners) {
@@ -228,7 +232,7 @@ export default {
           data: this.currentTableData,
           spanMethod: this.defaultSpanMethod(),
           cellClassName: this.cellClassName,
-          headerCellClassName: 'ctable__header-cell'
+          headerCellClassName: this.headerCellClassName
         }),
         ref: 'cusTable',
         on: (() => {
@@ -250,5 +254,63 @@ export default {
 }
 </script>
 
-<style lang="" scoped>
+<style lang="scss">
+.ctable__header-cell {
+	background-color: #deecfc !important;
+	border: 1px solid #ffffff;
+	color: #6a6c75;
+	padding: 3px 0px;
+	.caret-wrapper {
+		height: 22px;
+		.ascending {
+			top: 0px;
+		}
+		.descending {
+			bottom: 0px;
+		}
+	}
+}
+
+.ctable__normal-deep {
+	background-color: #5e7feb !important;
+	color: #ffffff;
+}
+
+.ctable__much_deep {
+	background-color: #4159d1 !important;
+	color: #ffffff;
+}
+
+.ctable__cell {
+	border: 1px solid #fff;
+	border-bottom: 1px solid #fff !important;
+	background-color: #fafbfc;
+	color: #999ba3;
+	font-size: 12px;
+	padding: 3px 0px;
+}
+
+.ctabel__cell-deep {
+	background-color: #ebedf0 !important;
+	color: #6a6c75;
+}
+
+.ctable__cell-normal-deep {
+	background-color: #ebedf0 !important;
+	padding: 0px 12px !important;
+}
+
+.ctable__cell-much-deep {
+	background-color: #f5f7fa !important;
+}
+
+.ctable__cell-disable {
+	background-color: #6a6c75;
+	font-weight: bold;
+}
+
+.ctable__summary {
+	background-color: #888 !important;
+	color: #fff;
+}
 </style>

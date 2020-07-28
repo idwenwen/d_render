@@ -1,6 +1,11 @@
 <template>
   <div class="box__container">
-    <el-radio :label="value" :disabled="disabled" @change="choosedRadio">{{ label }}</el-radio>
+    <el-radio
+      :label="value"
+      :disabled="disabled"
+      :class="{ 'box__check': Object.keys(group).length > 0 }"
+      @change="choosedRadio"
+    >{{ label }}</el-radio>
     <groups
       v-if="Object.keys(group).length > 0"
       ref="cusGroup"
@@ -8,6 +13,7 @@
       :disabled="disabled"
       :default="true"
       :class-name="group.className"
+      class="box__group"
       @change="groupChange"
       @form="groupForm"
       @search="groupSearch"
@@ -124,5 +130,13 @@ export default {
 }
 </script>
 
-<style lang="" scoped>
+<style lang="scss" scoped>
+@import '../../../style/position';
+.box__container {
+	@include flex(row, flex-end, center);
+	height: 30px;
+	.box__check {
+		margin-right: 10px;
+	}
+}
 </style>

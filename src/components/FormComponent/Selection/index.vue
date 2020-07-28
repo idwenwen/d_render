@@ -1,7 +1,12 @@
 <template>
-  <section class="filter__container">
+  <section
+    :class="{
+      'filter__container': true,
+      'filter__left-container': !(Object.keys(others).length > 0)
+    }"
+  >
     <c-select
-      v-if="others.length > 0"
+      v-if="Object.keys(others).length > 0"
       ref="cusSelect"
       :options="others"
       :multiple="multiple"
@@ -56,7 +61,7 @@ export default {
   },
   watch: {
     midPropResult() {
-      this.refOpera('cusSelect', 'setProperty')
+      this.refOpera('cusSelect', 'setProperty', this.midPropResult)
     },
     propResult() {
       this.change(this.propResult)
@@ -151,7 +156,7 @@ export default {
       this.formResult = Object.assign({}, this.formResult, res)
     },
     boxChange(res) {
-      if (!Array.isArray(this.others) || this.others.length === 0) {
+      if (Array.isArray(this.others) && this.others.length === 0) {
         this.propResult = res
       } else {
         this.midPropResult = res
@@ -190,5 +195,12 @@ export default {
 }
 </script>
 
-<style lang="" scoped>
+<style lang="scss" scoped>
+@import '../../../style/position';
+.filter__container {
+	@include flex(row, space-between, center);
+}
+.filter__left-container {
+	@include flex(row, flex-end, center);
+}
 </style>

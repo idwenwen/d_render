@@ -79,5 +79,34 @@ export default {
 }
 </script>
 
-<style lang="" scoped>
+<style lang="scss">
+@import '../../../style/position';
+.el-input {
+	max-width: 150px;
+	height: 24px;
+	input {
+		width: 100%;
+		height: 24px !important;
+		padding: 0px 10px;
+		background: #f8f8fa;
+		border-radius: 2px;
+		line-height: 24px;
+	}
+	.el-input__icon {
+		line-height: 24px;
+	}
+	.el-input-group__append {
+		border: 0px;
+		border-radius: 2px;
+		background: #f8f8fa;
+		padding-right: 10px;
+		padding-left: 0px;
+	}
+	.el-select__caret {
+		line-height: 24px;
+	}
+	.el-input__suffix-inner {
+		@include flex(row, flex-end, center);
+	}
+}
 </style>

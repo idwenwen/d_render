@@ -43,6 +43,11 @@ export default {
     }, 1000)
   },
   methods: {
+    resize() {
+      for (let i = 0; i < this.currentList.length; i++) {
+        this.refOpera('comp' + i, 'resize')
+      }
+    },
     filterByForm(param, pos) {
       if (this.currentList[pos + 1].type !== 'form') {
         this.refOpera('comp' + (pos + 1), 'linkageForm', param)
@@ -109,7 +114,6 @@ export default {
             this.filterByForm(formList, i)
           }
           variable.on.refresh = () => {
-            debugger
             this.refreshByForm(i)
           }
         }
@@ -118,7 +122,7 @@ export default {
             if (params.operation && typeof params.operation === 'function') {
               const res = {}
               for (let i = 0; i < this.currentList.length; i++) {
-                const val = this.currentList[i];
+                const val = this.currentList[i]
                 res[val.name || 'comp' + i] = this.$refs['comp' + i]
               }
               params.operation(res, params, this)
@@ -154,5 +158,11 @@ export default {
 }
 </script>
 
-<style lang="" scoped>
+<style lang="scss" scoped>
+.cus-group__container {
+	width: 100%;
+	.comp-group__each {
+		margin: 12px 0px;
+	}
+}
 </style>

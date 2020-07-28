@@ -23,9 +23,13 @@ const DataSort = {
           list.sort((a, b) => {
             const aVal = a[this.currentSortColumn.property]
             const bVal = b[this.currentSortColumn.property]
-            if (bVal === '-') {
+            if (b._total && aVal === '-') {
               return -1
-            } else if (aVal === '-') {
+            } else if (a._total && bVal === '-') {
+              return 1
+            } else if (b._total || bVal === '-') {
+              return -1
+            } else if (a._total || aVal === '-') {
               return 1
             } else {
               return compareVal(aVal, bVal)

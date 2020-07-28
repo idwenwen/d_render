@@ -1,8 +1,10 @@
 <template>
   <div>
-    <c-group 
-      :options="[dataes, table, charts]"
-    />
+    <!-- <c-table :header="table.props.header" :data="table.props.data.guest" /> -->
+    <!-- <c-group :options="[dataes, table]" /> -->
+    <div id="app">
+      <router-view />
+    </div>
   </div>
 </template>
 
@@ -11,101 +13,97 @@ export default {
   name: 'App',
   components: {
     // groups: () => import('./components/FormComponent/Group'),
-    // ctable: () => import('./components/TableComponent'),
+    cTable: () => import('./components/TableComponent/PaginationTable'),
     cGroup: () => import('./components/ComponentGroup')
   },
-  data() { 
+  data() {
     return {
       dataes: {
         type: 'form',
         props: {
-          form: [{
-            type: 'title',
-            props: {
-              title: 'Testing Form'
-            }
-          },{
-            type: 'filterSelect',
-            name: 'tableSelection',
-            props: {
-              options: [{
-                label: 'guest',
-                value: 'guest'
-              }, {
-                label: 'host',
-                value: [{
-                  label: '1000',
-                  value: '1000'
-                }, {
-                  label: '999',
-                  value: '999'
-                }]
-              }]
-            }
-          }, {
-            type: 'text',
-            props: {
-              content: 'this is total for {t}',
-              data: {
-                '{t}': 'testing'
+          form: [
+            {
+              type: 'title',
+              props: {
+                title: 'Testing Form'
               }
+            },
+            {
+              type: 'filterSelect',
+              name: 'tableSelection',
+              props: {
+                options: [
+                  {
+                    label: 'guest',
+                    value: 'guest'
+                  },
+                  {
+                    label: 'host',
+                    value: [
+                      {
+                        label: '1000',
+                        value: '1000'
+                      },
+                      {
+                        label: '999',
+                        value: '999'
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              type: 'text',
+              props: {
+                content: 'this is total for {t}',
+                data: {
+                  '{t}': 'testing'
+                }
+              }
+            },
+            {
+              type: 'input',
+              name: 'textInput',
+              props: {}
+            },
+            {
+              type: 'search'
             }
-          }, {
-            type: 'input',
-            name: 'textInput',
-            props: {}
-          }, {
-            type: 'search'
-          }],
+          ],
           toProperty: 'tableSelection'
         }
       },
       table: {
         type: 'table',
         props: {
-          data: {
-            'guest': [
-              { woe: 1.5023, iv: 1.25234, variable: 'x0'},
-              { woe: 1.5023, iv: 1.25234, variable: 'x1'},
-              { woe: 1.5023, iv: 1.25234, variable: 'x2'},
-              { woe: 1.5023, iv: 1.25234, variable: 'x3'},
-              { woe: 1.5023, iv: 1.25234, variable: 'x4'},
-              { woe: 1.5023, iv: 1.25234, variable: 'x5'},
-              { woe: 1.5023, iv: 1.25234, variable: 'x6'},
-              { woe: 1.5023, iv: 1.25234, variable: 'x7'},
-              { woe: 1.5023, iv: 1.25234, variable: 'x9'},
-              { woe: 1.5023, iv: 1.25234, variable: 'x10'},
-              { woe: 1.5023, iv: 1.25234, variable: 'x11'},
-              { woe: 1.5023, iv: 1.25234, variable: 'x12'},
-              { woe: 1.5023, iv: 1.25234, variable: 'x13'},
-            ],
-            '1000': [
-              { woe: 2.012341234, iv: 0.512341, variable: 'host_1000_1'},
-              { woe: 2.012341234, iv: 0.512341, variable: 'host_1000_2'},
-              { woe: 2.012341234, iv: 0.512341, variable: 'host_1000_3'},
-              { woe: 2.012341234, iv: 0.512341, variable: 'host_1000_4'}
-            ],
-            '999': [
-              { woe: 2.012341234, iv: 0.512341, variable: 'host_999_1'},
-              { woe: 2.012341234, iv: 0.512341, variable: 'host_999_2'},
-              { woe: 2.012341234, iv: 0.512341, variable: 'host_999_3'}
-            ]
-          },
+          data: [
+            { woe: 1.5023, iv: 1.25234, variable: 'x0' },
+            { woe: 1.5023, iv: 1.25234, variable: 'x1' },
+            { woe: 1.5023, iv: 1.25234, variable: 'x2' },
+            { woe: 1.5023, iv: 1.25234, variable: 'x3' },
+            { woe: 1.5023, iv: 1.25234, variable: 'x4' },
+            { woe: 1.5023, iv: 1.25234, variable: 'x5' },
+            { woe: 1.5023, iv: 1.25234, variable: 'x6' },
+            { woe: 1.5023, iv: 1.25234, variable: 'x7' },
+            { woe: 1.5023, iv: 1.25234, variable: 'x9' },
+            { woe: 1.5023, iv: 1.25234, variable: 'x10' },
+            { woe: 1.5023, iv: 1.25234, variable: 'x11' },
+            { woe: 1.5023, iv: 1.25234, variable: 'x12' },
+            { woe: 1.5023, iv: 1.25234, variable: 'x13' }
+          ],
           header: [
             {
-              type: 'index'
-            },
-            {
               label: 'variable',
-              value: 'variable'
+              prop: 'variable'
             },
             {
               label: 'woe',
-              value: 'woe'
+              prop: 'woe'
             },
             {
               label: 'iv',
-              value: 'iv'
+              prop: 'iv'
             }
           ]
         }
@@ -113,7 +111,7 @@ export default {
       charts: {
         type: 'chart',
         prop: {
-          options:  {
+          options: {
             title: {
               text: '折线图堆叠'
             },
@@ -187,5 +185,5 @@ export default {
       console.log(JSON.stringify(value))
     }
   }
- }
+}
 </script>
