@@ -21,12 +21,13 @@ import 'babel-polyfill'
 // import cTable from './Table.vue'
 // import groups from './Group.vue'
 // import Charts from './Chart.vue'
-import Async from './Async.vue'
+// import Async from './Async.vue'
+import ColTable from './ColTable.vue'
 
 Vue.use(ElementUI, { location })
 new Vue({
   el: '#app',
   store,
   router,
-  render: h => h(Async)
+  render: h => h(ColTable)
 })

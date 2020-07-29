@@ -1,5 +1,8 @@
 <template>
-  <section v-loading="tableLoading" class="ctable__container">
+  <section
+    v-loading="tableLoading"
+    class="ctable__container"
+  >
     <div class="ctable__table">
       <origin-table
         ref="originTable"
@@ -75,6 +78,7 @@ export default {
 
       property: '',
       currentDatas: [],
+      currentHeaders: [],
 
       currentPage: 1,
       currentTotal: this.total,
@@ -104,21 +108,15 @@ export default {
       }
     },
     currentTableHeader() {
-      if (!this.property && !Array.isArray(this.header)) {
-        return this.header.header
-      }
-      const list = Array.isArray(this.header)
-        ? [...this.header]
-        : this.getHeaderList(this.header, this.property)
       if (
         !this.headerPagination ||
 				this.pageSize < 0 ||
 				this.pageSize === 'all' ||
 				this.async
       ) {
-        return list
+        return this.currentHeaders
       } else {
-        return this.getHeaderPageChange(list, this.currentPage, this.pageSize)
+        return this.getHeaderPageChange(this.currentHeaders, this.currentPage, this.pageSize)
       }
     }
   },
@@ -230,12 +228,16 @@ export default {
       this.currentDatas = Array.isArray(this.data)
         ? [...this.data]
         : this.getList(this.data, this.property)
+      debugger
+      this.currentHeaders = Array.isArray(this.header)
+        ? [...this.header]
+        : this.getHeaderList(this.header, this.property)
       if (!this.async) {
         this.sortChange({
           column: this.currentSortColumn,
           order: this.currentOrder
         })
-        this.currentTotal = this.currentDatas.length
+        this.currentTotal = this.headerPagination ? this.currentHeaders.length : this.currentDatas.length
       } else {
         this.currentTotal = this.total
       }
