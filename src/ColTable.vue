@@ -4,8 +4,8 @@
       ref="cusTable"
       :header="header"
       :data="data"
-      :header-pagination="true"
-      :page-size="3"
+      :header-pagination="false"
+      :page-size="13"
     />
     <el-button @click="setProp('check1')">
       check1
@@ -32,7 +32,7 @@ export default {
         header: [
           {
             type: 'index',
-            label: 'index',
+            label: 'index'
           },
           {
             label: 'variable',

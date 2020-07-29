@@ -174,7 +174,7 @@ export default {
         obj.align = 'center'
       }
       const variable = {
-        props: Object.assign(obj, this.DEF_COLUMN_ATTR, props),
+        props: Object.assign(obj, (attrs.type !== 'index' ? this.DEF_COLUMN_ATTR : {}), props),
         on: (() => {
           const res = attrs.on || {}
           for (const key in this.$listeners) {
@@ -245,6 +245,7 @@ export default {
           return res
         })()
       }
+      debugger
       return h('el-table', variable, this.columns(h, this.header))
     }
   },

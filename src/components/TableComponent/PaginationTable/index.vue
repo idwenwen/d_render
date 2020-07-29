@@ -8,11 +8,12 @@
         ref="originTable"
         :data="currentTableData"
         :header="currentTableHeader"
+        :combine="!headerPagination"
         v-bind="$attrs"
         @sort-change="sortChange"
         @not-found="searchNotFound"
         @found="seearchFound"
-        v-on="tableEvents"
+        v-on="$listeners"
       />
     </div>
     <div class="ctable__pagination">
@@ -60,16 +61,14 @@ export default {
       default: 10
     },
     async: {
-      type: Boolean,
+      // eslint-disable-next-line vue/require-prop-type-constructor
+      type: Function | Boolean,
       default: false
     },
+
     headerPagination: {
       type: Boolean,
       default: false
-    },
-    on: {
-      type: Object,
-      default: () => {}
     }
   },
   data() {
@@ -91,9 +90,6 @@ export default {
     }
   },
   computed: {
-    tableEvents() {
-      return Object.assign({}, this.$listeners, this.on)
-    },
     currentTableData() {
       if (
         this.headerPagination ||
@@ -206,6 +202,18 @@ export default {
       }
       return res
     },
+    getCurrentHeader() {
+      const list =Array.isArray(this.header)
+        ? [...this.header]
+        : this.getHeaderList(this.header, this.property)
+      for (const val of list) {
+        if (val.type === 'index') {
+          val.pageFixed = true
+          break
+        }
+      }
+      return list
+    },
     getHeaderPageChange(list, cp, ps) {
       const li = [...list]
       const res = []
@@ -223,21 +231,29 @@ export default {
       res.push(...rest)
       return res
     },
+    headerTotal(list) {
+      let pf = 0
+      for (const val of list) {
+        if (val.pageFixed) {
+          pf ++
+        }
+      }
+      const eachPage = (this.pageSize - pf > 0 ? this.pageSize - pf : 1)
+      const actualTotalPage = Math.ceil((list.length - pf) / eachPage)
+      return actualTotalPage * (pf >= this.pageSize ? pf + 1 : this.pageSize)
+    },
     setProperty(value) {
       this.property = value
       this.currentDatas = Array.isArray(this.data)
         ? [...this.data]
         : this.getList(this.data, this.property)
-      debugger
-      this.currentHeaders = Array.isArray(this.header)
-        ? [...this.header]
-        : this.getHeaderList(this.header, this.property)
+      this.currentHeaders = this.getCurrentHeader()
       if (!this.async) {
         this.sortChange({
           column: this.currentSortColumn,
           order: this.currentOrder
         })
-        this.currentTotal = this.headerPagination ? this.currentHeaders.length : this.currentDatas.length
+        this.currentTotal = this.headerPagination ? this.headerTotal(this.currentHeaders) : this.currentDatas.length
       } else {
         this.currentTotal = this.total
       }
@@ -251,7 +267,7 @@ export default {
         this.currentDatas = this.sortMethod(this.currentDatas, column, order)
       }
     },
-    request() {
+    async request() {
       this.tableLoading = true
       const res = Object.assign(
         {},
@@ -263,7 +279,13 @@ export default {
         },
         this.formFilters
       )
-      this.$emit('request', res)
+      if (typeof this.async === 'function') {
+        const data = await this.async(res)
+        this.currentDatas = data.data || this.currentDatas
+        this.currentHeaders = data.header || this.currentHeaders
+      } else {
+        this.$emit('request', res)
+      }
     },
 
     change() {
