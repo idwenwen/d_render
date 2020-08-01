@@ -91,7 +91,6 @@ export default {
     },
 
     rangeByForm(param, pos) {
-      debugger
       for (let o = pos + 1; o < this.currentList.length; o++) {
         if (this.currentList[o].type === 'table') {
           this.refOpera('comp' + o, 'linkageRange', param)

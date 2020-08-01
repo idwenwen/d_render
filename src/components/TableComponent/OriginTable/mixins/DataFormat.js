@@ -36,7 +36,6 @@ const dataFormat = {
   },
   methods: {
     checkData(datas) {
-      debugger
       const res = JSON.parse(JSON.stringify(datas))
       for (const val of res) {
         for (const key in val) {

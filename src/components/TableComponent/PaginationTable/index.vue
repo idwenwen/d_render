@@ -344,7 +344,6 @@ export default {
     },
 
     linkageRange(param) {
-      debugger
       this.$refs['originTable'].linkageRange(param)
     }
   }
