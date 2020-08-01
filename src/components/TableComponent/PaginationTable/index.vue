@@ -12,12 +12,15 @@
         v-bind="$attrs"
         @sort-change="sortChange"
         @not-found="searchNotFound"
-        @found="seearchFound"
+        @found="searchFound"
+        @show-no-data="showNoData"
+        @show-data="showData"
         v-on="$listeners"
       />
     </div>
     <div class="ctable__pagination">
       <el-pagination
+        v-show="isNotNoData"
         ref="pagination"
         :layout="'prev, pager, next'"
         :page-size="(pageSize < 0 || typeof pageSize === 'string') ? currentTotal : pageSize"
@@ -86,7 +89,9 @@ export default {
       sortColumn: '',
       sortOrder: '',
 
-      formFilters: {}
+      formFilters: {},
+
+      isNotNoData: true
     }
   },
   computed: {
@@ -112,7 +117,11 @@ export default {
       ) {
         return this.currentHeaders
       } else {
-        return this.getHeaderPageChange(this.currentHeaders, this.currentPage, this.pageSize)
+        return this.getHeaderPageChange(
+          this.currentHeaders,
+          this.currentPage,
+          this.pageSize
+        )
       }
     }
   },
@@ -155,6 +164,12 @@ export default {
       } else {
         this.tableLoading = false
       }
+    },
+    showNoData() {
+      this.isNotNoData = false
+    },
+    showData() {
+      this.isNotNoData = true
     },
     getList(obj, pro) {
       const res = []
@@ -203,7 +218,7 @@ export default {
       return res
     },
     getCurrentHeader() {
-      const list =Array.isArray(this.header)
+      const list = Array.isArray(this.header)
         ? [...this.header]
         : this.getHeaderList(this.header, this.property)
       for (const val of list) {
@@ -235,10 +250,10 @@ export default {
       let pf = 0
       for (const val of list) {
         if (val.pageFixed) {
-          pf ++
+          pf++
         }
       }
-      const eachPage = (this.pageSize - pf > 0 ? this.pageSize - pf : 1)
+      const eachPage = this.pageSize - pf > 0 ? this.pageSize - pf : 1
       const actualTotalPage = Math.ceil((list.length - pf) / eachPage)
       return actualTotalPage * (pf >= this.pageSize ? pf + 1 : this.pageSize)
     },
@@ -253,7 +268,9 @@ export default {
           column: this.currentSortColumn,
           order: this.currentOrder
         })
-        this.currentTotal = this.headerPagination ? this.headerTotal(this.currentHeaders) : this.currentDatas.length
+        this.currentTotal = this.headerPagination
+          ? this.headerTotal(this.currentHeaders)
+          : this.currentDatas.length
       } else {
         this.currentTotal = this.total
       }
@@ -324,6 +341,11 @@ export default {
         this.formFilters = param
         this.toFirstPage()
       }
+    },
+
+    linkageRange(param) {
+      debugger
+      this.$refs['originTable'].linkageRange(param)
     }
   }
 }

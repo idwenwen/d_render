@@ -16,7 +16,8 @@ export default {
     csearch: () => import('../Searching'),
     cbutton: () => import('../Button'),
     clegend: () => import('../Legend'),
-    crefresh: () => import('../Refresh')
+    crefresh: () => import('../Refresh'),
+    crange: () => import('../Slider')
   },
   mixins: [basicOperation],
   props: {
@@ -185,6 +186,10 @@ export default {
       this.$emit('refresh')
     },
 
+    range(param) {
+      this.$emit('range', param)
+    },
+
     reset() {
       for (let i = 0; i < this.finalList.length; i++) {
         const val = this.finalList[i]
@@ -240,6 +245,11 @@ export default {
       if (type === 'refresh') {
         res.refresh = () => {
           this.refreshing()
+        }
+      }
+      if (type === 'range') {
+        res.range = (param) => {
+          this.range(param)
         }
       }
       res.search = res => {

@@ -10,8 +10,9 @@
       :placeholder="$attrs['placeholder'] || placeholder"
       :clearable="clearable"
       :disabled="disabled"
-      v-bind="$props"
+      v-bind="$attrs"
       @change="contentChange"
+      v-on="$listeners"
     >
       <template slot="suffix">
         <slot name="suffix" />

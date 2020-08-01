@@ -7,6 +7,9 @@ const SearchTable = {
     }
   },
   methods: {
+    notSearched() {
+      this.searched = -1
+    },
     search(list, content = '', col = '') {
       if (!content || this.searchedContent !== content || this.searchedCol !== col) {
         this.searched = -1
@@ -16,8 +19,9 @@ const SearchTable = {
       if (this.searchedContent) {
         const searchResult = this.searching(this.searchedContent, this.searchedCol, this.searched, list)
         if (searchResult < 0) {
-          this.$emit('notFound')
+          this.$emit('not-found')
         } else {
+          this.searched = searchResult
           if (this.setCurrentRow) {
             this.setCurrentRow(searchResult)
           }
@@ -31,14 +35,14 @@ const SearchTable = {
         const val = list[i]
         if (!col) {
           for (const key in val) {
-            if (val[key].match(content)) {
+            if (val[key].toString().match(content)) {
               res = i
               break
             }
           }
           if (res > begin) break
         } else {
-          if (val[col].match(content)) {
+          if (val[col].toString().match(content)) {
             res = i
             break
           }

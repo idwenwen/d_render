@@ -3,7 +3,8 @@
     ref="cusInput"
     placeholder="search variable"
     @change="valueChange"
-    @keyup.enter="searching"
+    @clear="searching"
+    @keyup.enter.native="searching"
   >
     <i slot="suffix" class="el-icon-search input__search" @click.stop="searching" />
   </cinput>
@@ -28,7 +29,7 @@ export default {
       this.inputed = res
     },
     searching() {
-      this.$emit('searching', this.inputed)
+      this.$emit('search', this.inputed)
     },
     disable() {
       this.$refs['cusInput'].disable()

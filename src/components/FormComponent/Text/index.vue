@@ -54,10 +54,10 @@ export default {
       for (const key in this.data) {
         const rep =
           typeof this.data[key] === 'function'
-            ? this.val
-              ? this.data[key](this.val)
-              : key
-            : this.data[key]
+          	? this.val
+	  			    ? this.data[key](this.val)
+	  			    : key
+	  			  : this.data[key]
         res = res.replace(key, rep)
       }
       this.value = res

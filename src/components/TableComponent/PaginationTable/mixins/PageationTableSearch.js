@@ -2,17 +2,30 @@ const pageTableSearch = {
   data() {
     return {
       searchContentFound: false,
-      searchingNow: false,
       currentSearchContent: '',
-      currentSearchCol: ''
+      currentSearchCol: '',
+      originPage: -1
     }
   },
   methods: {
-    searching(content = '', col = '') {
-      this.searchingNow = false
+    searching(content = '', col = '', mid = false) {
+      if (this.currentSearchContent !== content || this.currentSearchCol !== col) {
+        this.showData()
+        this.$refs['originTable'].showData()
+      }
       this.currentSearchCol = col
       this.currentSearchContent = content
-      this.$ref['originTable'].searchInTable(content, col)
+      if (!content) {
+        if (this.originPage > 0) {
+          this.pageTo(this.originPage)
+          this.originPage = -1
+        }
+      } else {
+        if (!mid) {
+          this.originPage = this.currentPage
+        }
+        this.$refs['originTable'].searchInTable(content, col)
+      }
     },
 
     searchNotFound() {
@@ -23,17 +36,20 @@ const pageTableSearch = {
       } else if (this.searchContentFound) {
         this.toFirstPage()
         this.searchContentFound = false
+        this.searchAfter()
+      } else {
+        this.$refs['originTable'].showNoData()
       }
-      this.searchingNow = true
     },
 
-    seearchFound() {
+    searchFound() {
       this.searchContentFound = true
+      this.originPage = this.currentPage
     },
 
-    searchAfter() {
+    searchAfter(mid = true) {
       this.$nextTick(() => {
-        this.searching(this.currentSearchContent, this.currentSearchCol)
+        this.searching(this.currentSearchContent, this.currentSearchCol, mid)
       })
     }
   }

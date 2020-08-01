@@ -1,13 +1,14 @@
 <script>
 import basicOperation from '@/mixin/BasicOperation'
 export default {
-  name: 'ComponentGroup',
+  name: 'Cgroup',
   components: {
-    cform: () => import('../FormComponent/Group'),
-    ctable: () => import('../TableComponent/PaginationTable'),
-    cchart: () => import('../ChartComponent/ChartContainer'),
-    cechart: () => import('../ChartComponent/EchartsInstance'),
-    casync: () => import('../AsyncComponent')
+    Cform: () => import('../FormComponent/Group'),
+    Ctable: () => import('../TableComponent/PaginationTable'),
+    Cchart: () => import('../ChartComponent/ChartContainer'),
+    Cechart: () => import('../ChartComponent/EchartsInstance'),
+    Casync: () => import('../AsyncComponent'),
+    Ctitle: () => import('../FormComponent/Text/Title')
   },
   mixins: [basicOperation],
   props: {
@@ -49,7 +50,9 @@ export default {
       }
     },
     filterByForm(param, pos) {
-      if (this.currentList[pos + 1].type !== 'form') {
+      if (
+        ['table', 'chart', 'async'].indexOf(this.currentList[pos + 1].type) >= 0
+      ) {
         this.refOpera('comp' + (pos + 1), 'linkageForm', param)
       }
     },
@@ -61,19 +64,53 @@ export default {
 
     changeByForm(param, pos) {
       for (let o = pos + 1; o < this.currentList.length; o++) {
-        this.refOpera('comp' + o, 'linkageChange', param)
+        if (
+          ['table', 'chart', 'async'].indexOf(this.currentList[o].type) >= 0
+        ) {
+          this.refOpera('comp' + o, 'linkageChange', param)
+        }
       }
     },
 
     changeByOutside(param, pos) {
       for (let o = pos - 1; o >= 0; o--) {
-        this.refOpera('comp' + o, 'linkageOutside', param)
+        if (this.currentList[o].type === 'form') {
+          this.refOpera('comp' + o, 'linkageOutside', param)
+          break
+        }
       }
     },
 
     refreshByForm(pos) {
       for (let o = pos + 1; o < this.currentList.length; o++) {
-        this.refOpera('comp' + o, 'linkageRefresh')
+        if (['async', 'chart'].indexOf(this.currentList[o].type) >= 0) {
+          this.refOpera('comp' + o, 'linkageRefresh')
+          break
+        }
+      }
+    },
+
+    rangeByForm(param, pos) {
+      debugger
+      for (let o = pos + 1; o < this.currentList.length; o++) {
+        if (this.currentList[o].type === 'table') {
+          this.refOpera('comp' + o, 'linkageRange', param)
+          break
+        }
+      }
+    },
+
+    fixedAfterRequest() {
+      const vm = this
+      return params => {
+        if (params.operation && typeof params.operation === 'function') {
+          const res = {}
+          for (let i = 0; i < vm.currentList.length; i++) {
+            const val = vm.currentList[i]
+            res[val.name || 'comp' + i] = vm.$refs['comp' + i]
+          }
+          params.operation(res, params, vm)
+        }
       }
     },
 
@@ -89,6 +126,45 @@ export default {
         this.refOpera('comp' + val, 'setDefault')
       }
     },
+
+    addEvents(obj, operation) {
+      for (const name in operation) {
+        obj.on[name] = operation[name]
+      }
+    },
+
+    addEventForForm(obj, pos) {
+      this.addEvents(obj, {
+        search: content => {
+          this.searchByForm(content, pos)
+        },
+        form: formList => {
+          this.filterByForm(formList, pos)
+        },
+        refresh: () => {
+          this.refreshByForm(pos)
+        },
+        change: param => {
+          this.changeByForm(param, pos)
+        },
+        range: param => {
+          this.rangeByForm(param, pos)
+        }
+      })
+    },
+
+    addEventForOthers(obj, pos, async = false) {
+      const eves = {
+        change: param => {
+          this.changeByOutside(param, pos)
+        }
+      }
+      if (async) {
+        eves.afterRequest = this.fixedAfterRequest()
+      }
+      this.addEvents(obj, eves)
+    },
+
     children(h) {
       const child = []
       for (let i = 0; i < this.currentList.length; i++) {
@@ -96,38 +172,16 @@ export default {
         const variable = {
           props: val.props,
           ref: 'comp' + i,
-          on: {
-            change: param => {
-              if (val.type === 'form') {
-                this.changeByForm(param, i)
-              } else {
-                this.changeByOutside(param, i)
-              }
-            }
-          }
+          on: {}
         }
         if (val.type === 'form') {
-          variable.on.search = content => {
-            this.searchByForm(content, i)
-          }
-          variable.on.form = formList => {
-            this.filterByForm(formList, i)
-          }
-          variable.on.refresh = () => {
-            this.refreshByForm(i)
-          }
+          this.addEventForForm(variable, i)
+        }
+        if (['table', 'chart'].indexOf(val.type) >= 0) {
+          this.addEventForOthers(variable, i, false)
         }
         if (val.type === 'async') {
-          variable.on.afterRequest = params => {
-            if (params.operation && typeof params.operation === 'function') {
-              const res = {}
-              for (let i = 0; i < this.currentList.length; i++) {
-                const val = this.currentList[i]
-                res[val.name || 'comp' + i] = this.$refs['comp' + i]
-              }
-              params.operation(res, params, this)
-            }
-          }
+          this.addEventForOthers(variable, i, true)
         }
         child.push(
           h(
@@ -135,7 +189,7 @@ export default {
             {
               class: 'comp-group__each'
             },
-            [h('c' + val.type, variable)]
+            [h('C' + val.type, variable)]
           )
         )
       }

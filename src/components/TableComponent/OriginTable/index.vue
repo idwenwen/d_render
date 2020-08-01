@@ -3,7 +3,7 @@ import spanMethod from './mixins/SpanMethod'
 import dataSort from './mixins/DataSort'
 import dataFormat from './mixins/DataFormat'
 import cellClass from './mixins/CellClass'
-import tableSearch from './mixins/CellClass'
+import tableSearch from './mixins/TableSearch'
 import clink from '../CustomColumn/Linking'
 import ceditor from '../CustomColumn/Editor'
 import cweight from '../CustomColumn/Weight'
@@ -56,6 +56,7 @@ export default {
   data() {
     return {
       currentTableData: [],
+      dataCopyList: [],
       tableEvents: ['sort-change'],
       presetHeaderType: {
         link: 'clink',
@@ -66,7 +67,8 @@ export default {
       DEF_TABLE_ATTR: {
         emptyText: 'No data',
         elementLoadingText: 'Loading',
-        size: 'mini'
+        size: 'mini',
+        highlightCurrentRow: true
       },
       DEF_COLUMN_ATTR: {
         showOverflowTooltip: true
@@ -82,6 +84,7 @@ export default {
           column: this.currentSortColumn,
           order: this.currentOrder
         })
+        this.notSearched()
       },
       deep: true
     },
@@ -90,6 +93,23 @@ export default {
         this.checkWeight(this.header)
       },
       deep: true
+    },
+    currentTableData: {
+      handler() {
+        if (this.currentTableData.length > 0) {
+          this.dataCopyList = this.currentTableData
+        }
+      }
+    },
+    range: {
+      handler() {
+        this.currentTableData = this.checkData(this.data)
+        this.sortChange({
+          column: this.currentSortColumn,
+          order: this.currentOrder
+        })
+        this.notSearched()
+      }
     }
   },
   mounted() {
@@ -101,6 +121,15 @@ export default {
     })
   },
   methods: {
+    showNoData() {
+      this.dataCopyList = this.currentTableData
+      this.currentTableData = []
+      this.$emit('show-no-data')
+    },
+    showData() {
+      this.currentTableData = this.dataCopyList
+      this.$emit('show-data')
+    },
     checkWeight(li) {
       for (let i = li.length - 1; i >= 0; i--) {
         const val = li[i]
@@ -118,7 +147,7 @@ export default {
     },
 
     setCurrentRow(row) {
-      this.$refs['cTable'][0].setCurrentRow(row)
+      this.$refs['cusTable'].setCurrentRow(this.currentTableData[row])
     },
 
     sortChange({ column, order }) {
@@ -174,7 +203,11 @@ export default {
         obj.align = 'center'
       }
       const variable = {
-        props: Object.assign(obj, (attrs.type !== 'index' ? this.DEF_COLUMN_ATTR : {}), props),
+        props: Object.assign(
+          obj,
+          attrs.type !== 'index' ? this.DEF_COLUMN_ATTR : {},
+          props
+        ),
         on: (() => {
           const res = attrs.on || {}
           for (const key in this.$listeners) {
@@ -245,7 +278,6 @@ export default {
           return res
         })()
       }
-      debugger
       return h('el-table', variable, this.columns(h, this.header))
     }
   },
@@ -261,6 +293,7 @@ export default {
 	border: 1px solid #ffffff;
 	color: #6a6c75;
 	padding: 3px 0px;
+	font-size: 0.86rem;
 	.caret-wrapper {
 		height: 22px;
 		.ascending {
@@ -286,7 +319,8 @@ export default {
 	border: 1px solid #fff;
 	border-bottom: 1px solid #fff !important;
 	background-color: #fafbfc;
-	color: #999ba3;
+	color: #6a6c75;
+	font-size: 0.86rem;
 	font-size: 12px;
 	padding: 3px 0px;
 }
@@ -306,12 +340,17 @@ export default {
 }
 
 .ctable__cell-disable {
-	background-color: #6a6c75;
-	font-weight: bold;
+	background-color: #ebedf0 !important;
+	color: #999ba3;
 }
 
 .ctable__summary {
-	background-color: #888 !important;
+	background-color: #ebedf0 !important;
+	color: #6a6c75;
+}
+
+.current-row > td {
+	background-color: #e8a766 !important;
 	color: #fff;
 }
 </style>
