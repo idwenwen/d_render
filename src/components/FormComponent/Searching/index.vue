@@ -1,12 +1,18 @@
 <template>
   <cinput
     ref="cusInput"
+    :class-name="className"
+    :input-class-name="inputClassName"
     placeholder="search variable"
     @change="valueChange"
     @clear="searching"
     @keyup.enter.native="searching"
   >
-    <i slot="suffix" class="el-icon-search input__search" @click.stop="searching" />
+    <i
+      slot="suffix"
+      class="el-icon-search input__search"
+      @click.stop="searching"
+    />
   </cinput>
 </template>
 
@@ -19,6 +25,16 @@ export default {
     cinput
   },
   mixins: [basicOperation],
+  props: {
+    className: {
+      type: String,
+      default: ''
+    },
+    inputClassName: {
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
       inputed: ''
@@ -55,7 +71,7 @@ export default {
 	padding-left: 2px;
 	margin-top: 1px;
 	margin-bottom: 1px;
-	background-color: #fff;
+	background-color:rgb(248, 248, 250);
 	cursor: pointer;
 }
 </style>

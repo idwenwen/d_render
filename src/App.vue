@@ -13,8 +13,8 @@ export default {
   name: 'App',
   components: {
     // groups: () => import('./components/FormComponent/Group'),
-    cTable: () => import('./components/TableComponent/PaginationTable'),
-    cGroup: () => import('./components/ComponentGroup')
+    // cTable: () => import('./components/TableComponent/PaginationTable'),
+    // cGroup: () => import('./components/ComponentGroup')
   },
   data() {
     return {

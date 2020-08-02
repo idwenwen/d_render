@@ -190,6 +190,10 @@ export default {
       this.$emit('range', param)
     },
 
+    selected(param) {
+      this.$emit('selected', param)
+    },
+
     reset() {
       for (let i = 0; i < this.finalList.length; i++) {
         const val = this.finalList[i]

@@ -3,6 +3,7 @@
     <el-checkbox-group
       v-if="Array.isArray(options)"
       v-model="selected"
+      :class="groupClassName"
       class="checkbox-group__container"
     >
       <c-box
@@ -13,6 +14,7 @@
         :value="item.value"
         :group="item.group || {}"
         :single="false"
+        :class="className"
         class="checkbox-group__box"
         @change="boxChange(arguments, item.value)"
         @form="boxForm(arguments, item.value)"
@@ -25,6 +27,7 @@
       :label="options.label"
       :value="options.value"
       :group="options.group || {}"
+      :class="className"
       @change="boxChange(arguments, options.value)"
       @form="boxForm(arguments, options.value)"
       @search="boxSearch"
@@ -50,6 +53,18 @@ export default {
       // eslint-disable-next-line vue/require-prop-type-constructor
       type: Boolean | Array,
       default: false
+    },
+    single: {
+      type: Boolean,
+      default: false
+    },
+    className: {
+      type: String,
+      default: ''
+    },
+    groupClassName: {
+      type: String,
+      default: ''
     }
   },
   data() {
@@ -61,6 +76,12 @@ export default {
     }
   },
   watch: {
+    options: {
+      handler() {
+        this.selected = []
+      },
+      deep: true
+    },
     propResult: {
       handler() {
         this.change()
@@ -75,15 +96,19 @@ export default {
     },
     selected: {
       handler() {
-        const list = this.toArr(this.options)
-        for (const val of list) {
-          if (this.selected.indexOf(val.value) >= 0) {
-            this.refOpera(val.value, 'chooseBox')
-          } else {
-            this.refOpera(val.value, 'unchooseBox')
+        if (this.selected.length >= 2 && this.single) {
+          this.selected = this.selected.slice(this.selected.length - 1)
+        } else {
+          const list = this.toArr(this.options)
+          for (const val of list) {
+            if (this.selected.indexOf(val.value) >= 0) {
+              this.refOpera(val.value, 'chooseBox')
+            } else {
+              this.refOpera(val.value, 'unchooseBox')
+            }
           }
+          this.change()
         }
-        this.change()
       },
       deep: true
     }
@@ -99,7 +124,9 @@ export default {
       this.$emit('search', res)
     },
     checkCanSend() {
-      if (!this.canSend) {
+      if (this.single) {
+        this.canSend = true
+      } else if (!this.canSend) {
         let canSend = true
         if (Array.isArray(this.options)) {
           for (const val of this.options) {

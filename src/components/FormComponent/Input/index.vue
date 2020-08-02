@@ -1,7 +1,13 @@
 <template>
-  <div :class="className" class="input__container">
+  <div
+    :class="className"
+    class="input__container"
+  >
     <!-- label展示内容 -->
-    <span v-if="label" class="input__label">{{ label + ':' }}</span>
+    <span
+      v-if="label"
+      class="input__label"
+    >{{ label + ':' }}</span>
 
     <el-input
       ref="cusInput"
@@ -10,6 +16,7 @@
       :placeholder="$attrs['placeholder'] || placeholder"
       :clearable="clearable"
       :disabled="disabled"
+      :class="inputClassName"
       v-bind="$attrs"
       @change="contentChange"
       v-on="$listeners"
@@ -39,6 +46,10 @@ export default {
     format: {
       // eslint-disable-next-line vue/require-prop-type-constructor
       type: String | Object,
+      default: ''
+    },
+    inputClassName: {
+      type: String,
       default: ''
     }
   },
