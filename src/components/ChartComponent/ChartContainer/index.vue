@@ -72,6 +72,7 @@ export default {
       }: {})
     },
     currentLegend() {
+      debugger
       const chooseRes = []
       if (this.group.length > 0) {
         for (const item of this.group) {
@@ -137,10 +138,14 @@ export default {
   methods: {
     setLegend(tableSetting) {
       const res = []
-      for (const val of tableSetting.series) {
-        res.push(val.name)
+      if (tableSetting.series) {
+        for (const val of tableSetting.series) {
+          res.push(val.name)
+        }
+        if (res.length > 0) {
+          tableSetting.legend = { data: res }
+        }
       }
-      tableSetting.legend = { data: res }
       return tableSetting
     },
 

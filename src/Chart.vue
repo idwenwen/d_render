@@ -3,7 +3,7 @@
     <cchart
       ref="setting"
       :setting="setting"
-      :legend="'custom'"
+      :legend="true"
     />
     <el-button @click="change">
       change
