@@ -161,7 +161,7 @@ export default {
       } : null
     },
     setProperty(param) {
-      this.property = param
+      this.property = Array.isArray(param) ? param[0] : param
     }
   }
 }

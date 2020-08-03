@@ -3,7 +3,6 @@
     <cchart
       ref="setting"
       :setting="setting"
-      :options="series"
       :legend="'custom'"
     />
     <el-button @click="change">
@@ -47,7 +46,32 @@ export default {
           },
           yAxis: {
             type: 'value'
-          }
+          },
+          series: [{
+            name: 'iteration_0',
+            type: 'line',
+            data: [120, 132, 101, 134, 90, 230, 210]
+          },
+          {
+            name: 'iteration_1',
+            type: 'line',
+            data: [220, 182, 191, 234, 290, 330, 310]
+          },
+          {
+            name: 'iteration_2',
+            type: 'line',
+            data: [150, 232, 201, 154, 190, 330, 410]
+          },
+          {
+            name: 'iteration_3',
+            type: 'line',
+            data: [320, 332, 301, 334, 390, 330, 320]
+          },        
+          {
+            name: 'iteration_4',
+            type: 'line',
+            data: [820, 932, 901, 934, 1290, 1330, 1320]
+          }]
         },
         check2: {
           title: {
@@ -74,59 +98,28 @@ export default {
           },
           yAxis: {
             type: 'value'
-          }
+          },
+          series: [{
+            name: 'iteration_0',
+            type: 'line',
+            data: [120, 132, 101, 134, 90, 230, 210]
+          },
+          {
+            name: 'iteration_1',
+            type: 'line',
+            data: [220, 182, 191, 234, 290, 330, 310]
+          },
+          {
+            name: 'iteration_2',
+            type: 'line',
+            data: [150, 232, 201, 154, 190, 330, 410]
+          },
+          {
+            name: 'iteration_4',
+            type: 'line',
+            data: [820, 932, 901, 934, 1290, 1330, 1320]
+          }]
         }
-      },
-      series: {
-        check1: [
-          {
-            name: 'iteration_0',
-            type: 'line',
-            data: [120, 132, 101, 134, 90, 230, 210]
-          },
-          {
-            name: 'iteration_1',
-            type: 'line',
-            data: [220, 182, 191, 234, 290, 330, 310]
-          },
-          {
-            name: 'iteration_2',
-            type: 'line',
-            data: [150, 232, 201, 154, 190, 330, 410]
-          },
-          {
-            name: 'iteration_3',
-            type: 'line',
-            data: [320, 332, 301, 334, 390, 330, 320]
-          },        
-          {
-            name: 'iteration_4',
-            type: 'line',
-            data: [820, 932, 901, 934, 1290, 1330, 1320]
-          }
-        ],
-        check2: [
-          {
-            name: 'iteration_0',
-            type: 'line',
-            data: [120, 132, 101, 134, 90, 230, 210]
-          },
-          {
-            name: 'iteration_1',
-            type: 'line',
-            data: [220, 182, 191, 234, 290, 330, 310]
-          },
-          {
-            name: 'iteration_2',
-            type: 'line',
-            data: [150, 232, 201, 154, 190, 330, 410]
-          },
-          {
-            name: 'iteration_4',
-            type: 'line',
-            data: [820, 932, 901, 934, 1290, 1330, 1320]
-          }
-        ]
       }
     }
   },
