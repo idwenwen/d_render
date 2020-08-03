@@ -1,5 +1,8 @@
 <template>
-  <cgroup :options="currentGroup" class="chart__container" />
+  <cgroup
+    :options="currentGroup"
+    class="chart__container"
+  />
 </template>
 
 <script>
@@ -57,13 +60,16 @@ export default {
       const series = Array.isArray(this.allOptions)
         ? this.allOptions
         : this.propfilter(this.allOptions)
-      const setting = JSON.parse(JSON.stringify(this.setting))
+      let setting = JSON.parse(JSON.stringify(this.setting))
+      if (setting[this.property]) {
+        setting = setting[this.property]
+      }
       if (!this.legend || this.legend === 'custom') {
         delete setting.legend
       }
-      return Object.assign({}, setting, {
+      return Object.assign({}, setting, series.length > 0 ? {
         series
-      })
+      }: {})
     },
     currentLegend() {
       const chooseRes = []
@@ -75,7 +81,7 @@ export default {
           })
         }
       }
-      const series = this.currentOptions.series
+      const series = this.currentOptions.series || []
       for (const val of series) {
         if (val.type === this.type) {
           if (this.group.length > 0) {
@@ -101,7 +107,10 @@ export default {
       const options = []
       const tableSetting = Object.assign({}, this.currentOptions)
       if (this.legend === 'custom') {
-        options.push(this.setCusLegend())
+        const mid = this.setCusLegend()
+        if (mid) {
+          options.push(mid)
+        }
       } else if (this.legend && !tableSetting.legend) {
         this.setLegend(tableSetting)
       }
@@ -136,7 +145,7 @@ export default {
     },
 
     setCusLegend() {
-      return {
+      return this.currentLegend.length > 0 ? {
         type: 'form',
         props: {
           form: [
@@ -149,7 +158,10 @@ export default {
             }
           ]
         }
-      }
+      } : null
+    },
+    setProperty(param) {
+      this.property = param
     }
   }
 }

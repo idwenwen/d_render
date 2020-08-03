@@ -1,5 +1,7 @@
 <template>
-  <div />
+  <div class="tree__container">
+    <header class="" />
+  </div>
 </template>
 
 <script>

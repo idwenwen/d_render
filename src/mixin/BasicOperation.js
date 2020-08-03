@@ -10,7 +10,10 @@ const BasicOperation = {
         this.$refs[name][functionName](...args)
       } else if (this.$refs[name] && this.$refs[name][0] && this.$refs[name][0][functionName]) {
         this.$refs[name][0][functionName](...args)
+      } else {
+        return false
       }
+      return true
     },
 
     toArr(data) {

@@ -190,8 +190,8 @@ export default {
       this.$emit('range', param)
     },
 
-    selected(param) {
-      this.$emit('selected', param)
+    transform(param) {
+      this.$emit('transform', param)
     },
 
     reset() {
@@ -254,6 +254,11 @@ export default {
       if (type === 'range') {
         res.range = (param) => {
           this.range(param)
+        }
+      }
+      if (type === 'transform') {
+        res.transform = (param) => {
+          this.transform(param)
         }
       }
       res.search = res => {

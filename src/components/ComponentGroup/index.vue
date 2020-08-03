@@ -19,31 +19,39 @@ export default {
   },
   data() {
     return {
-      currentList: [...this.options]
+      currentList: [...this.options],
+      timer: new Date().getTime()
     }
   },
   watch: {
     options: {
       handler() {
         this.currentList = [...this.options]
+        this.timer = new Date().getTime()
         this.$nextTick(() => {
-          this.setDefault()
+          this.needDefault()
         })
       }
     }
   },
   mounted() {
     // todo 内容有待更新 //
-    const check = setInterval(() => {
-      if (this.$refs && Object.keys(this.$refs).length > 0) {
-        clearInterval(check)
-        this.$nextTick(() => {
-          this.setDefault()
-        })
-      }
-    }, 1000)
+    // const check = setInterval(() => {
+      // clearInterval(check)
+      this.$nextTick(() => {
+        this.needDefault()
+      })
+    // }, 1000)
   },
   methods: {
+    needDefault(next) {
+      const notFinish = this.setDefault(next)
+      if (notFinish.length > 0) {
+        setTimeout(() => {
+          this.needDefault(notFinish)
+        }, 100)
+      }
+    },
     resize() {
       for (let i = 0; i < this.currentList.length; i++) {
         this.refOpera('comp' + i, 'resize')
@@ -51,7 +59,7 @@ export default {
     },
     filterByForm(param, pos) {
       if (
-        ['table', 'chart', 'async'].indexOf(this.currentList[pos + 1].type) >= 0
+        ['table', 'chart', 'async', 'echart'].indexOf(this.currentList[pos + 1].type) >= 0
       ) {
         this.refOpera('comp' + (pos + 1), 'linkageForm', param)
       }
@@ -65,7 +73,7 @@ export default {
     changeByForm(param, pos) {
       for (let o = pos + 1; o < this.currentList.length; o++) {
         if (
-          ['table', 'chart', 'async'].indexOf(this.currentList[o].type) >= 0
+          ['table', 'chart', 'async', 'echart'].indexOf(this.currentList[o].type) >= 0
         ) {
           this.refOpera('comp' + o, 'linkageChange', param)
         }
@@ -113,17 +121,23 @@ export default {
       }
     },
 
-    setDefault() {
-      const res = []
-      for (let i = 0; i < this.currentList.length; i++) {
-        const val = this.currentList[i]
-        if (val.type === 'form') {
-          res.push(i)
+    setDefault(list = []) {
+      const res = list
+      if (res.length === 0) {
+        for (let i = 0; i < this.currentList.length; i++) {
+          const val = this.currentList[i]
+          if (val.type === 'form') {
+            res.push(i)
+          }
         }
       }
+      const notFinish = []
       for (const val of res) {
-        this.refOpera('comp' + val, 'setDefault')
+        if (!this.refOpera('comp' + val, 'setDefault')) {
+          notFinish.push(val)
+        }
       }
+      return notFinish
     },
 
     addEvents(obj, operation) {
@@ -171,6 +185,7 @@ export default {
         const variable = {
           props: val.props,
           ref: 'comp' + i,
+          key: this.timer + i,
           on: {}
         }
         if (val.type === 'form') {
