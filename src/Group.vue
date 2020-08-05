@@ -17,10 +17,29 @@ export default {
         props: {
           options: [{
             label: 'check1',
-            value: 'check1'
+            value: [
+              {
+                label: 'check1_1',
+                value: 'check1_1'
+              }
+            ]
           }, {
             label: 'check2',
-            value: 'check2'
+            value: [
+              {
+                label: 'check2_1',
+                value: [
+                  {
+                    label: 'check2_1_1',
+                    value: 'check2_1_1'
+                  },
+                  {
+                    label: 'check2_1_2',
+                    value: 'check2_1_2'
+                  }
+                ]
+              }
+            ]
           }]
         }
       }],
@@ -111,8 +130,9 @@ export default {
   },
   beforeMount() {
     this.data = {
-      check1: this.initData(15),
-      check2: this.initData(20)
+      check1_1: this.initData(15),
+      check2_1_1: this.initData(20),
+      check2_1_2: this.initData(23)
     }
   },
   methods: {

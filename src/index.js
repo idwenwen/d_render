@@ -20,18 +20,19 @@ import 'babel-polyfill'
 // import Form from './Form.vue'
 // import cTable from './Table.vue'
 // import groups from './Group.vue'
-import Charts from './Chart.vue'
+// import Charts from './Chart.vue'
 // import Async from './Async.vue'
 // import ColTable from './ColTable.vue'
 // import FormTest from './FormTest.vue'
 // import Transform from './Transform.vue'
 // import TreeSelect from './TreeSelect.vue'
 // import Sorting from './sorting.vue'
+import Pearson from './Pearson.vue'
 
 Vue.use(ElementUI, { location })
 new Vue({
   el: '#app',
   store,
   router,
-  render: h => h(Charts)
+  render: h => h(Pearson)
 })
